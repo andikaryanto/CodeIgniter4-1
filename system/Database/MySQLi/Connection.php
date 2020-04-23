@@ -329,7 +329,7 @@ class Connection extends BaseConnection implements ConnectionInterface
 		try
 		{
 			return $this->connID->query($this->prepQuery($sql));
-		}
+		}	
 		catch (\mysqli_sql_exception $e)
 		{
 			log_message('error', $e);

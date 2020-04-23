@@ -86,7 +86,7 @@ class Model
 	/**
 	 * Name of database table
 	 *
-	 * @var string
+	 * @var 
 	 */
 	protected $table;
 
@@ -335,7 +335,7 @@ class Model
 		{
 			$this->db = Database::connect($this->DBGroup);
 		}
-
+		
 		$this->tempReturnType     = $this->returnType;
 		$this->tempUseSoftDeletes = $this->useSoftDeletes;
 

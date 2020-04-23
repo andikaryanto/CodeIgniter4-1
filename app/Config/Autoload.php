@@ -71,7 +71,10 @@ class Autoload extends \CodeIgniter\Config\AutoloadConfig
 		 *       'MyClass'   => '/path/to/class/file.php'
 		 *   ];
 		 */
-		$classmap = [];
+		$classmap = [
+			// 'App\Globals\ListEntity' => APPPATH. 'Globals/ListEntity.php',
+			// 'App\Classes\Exception\'
+		];
 
 		//--------------------------------------------------------------------
 		// Do Not Edit Below This Line
