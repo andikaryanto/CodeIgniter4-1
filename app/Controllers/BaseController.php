@@ -205,8 +205,9 @@ class BaseController extends Controller
         //     $data = $datas;
         // } else {
         //     $data = $datas;
-        // }
-        view('shared/header', $menudata);
+		// }
+
+        echo view('shared/header', $menudata);
         view($url, $data);
         view('shared/footer', array());
     }

@@ -272,7 +272,7 @@ class BaseEntity{
         } else if (substr($name, 0, 4) == 'get_' && substr($name, 4, 6) == 'first_') {
 
             $params = isset($argument[0]) ? $argument[0] : null;
-            $entity = 'App\\Entities\\' .substr($name, 10)."Entity";
+            $entity = 'App\\Entities\\' .substr($name, 10)."Eloquent";
             $field = str_replace("Entity", "" , explode("\\",static::class)[2]) . '_Id';
 
             $entityobject = $entity;

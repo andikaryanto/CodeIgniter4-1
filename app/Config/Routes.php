@@ -34,11 +34,11 @@ $routes->get('/insert', 'Home::insert');
 $routes->get('/find', 'Home::find');
 $routes->get('/findAll', 'Home::findAll');
 $routes->get('/edit', 'Home::edit');
+$routes->get('/builder', 'Home::builder');
 
 $routes->get('/mgroupuser', 'M_groupuser::index');
-$routes->get('/mgroupuser/add', 'Home::add');
-$routes->get('/findAll', 'Home::findAll');
-$routes->get('/edit', 'Home::edit');
+$routes->get('/mgroupuser/add', 'M_groupuser::add');
+$routes->get('/mgroupuser/getAllData', 'M_groupuser::getAllData');
 
 /**
  * --------------------------------------------------------------------

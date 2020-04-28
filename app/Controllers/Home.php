@@ -2,13 +2,11 @@
 
 use App\Classes\Exception\DbException;
 use App\Entities\M_GroupuserEntity;
-use App\Entities\M_SubvillageEntity;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use App\Controllers\BaseController;
+use App\Eloquents\M_Groupusers;
+use App\Eloquents\M_Villages;
 use App\Entities\M_ProvinceEntity;
-use App\Entities\M_VillageEntity;
-use App\Entities\T_DisasteroccurEntity;
-use App\Entities\T_DisasterreportEntity;
 
 class Home extends BaseController
 {
@@ -16,29 +14,41 @@ class Home extends BaseController
 	{
 		
 	}
+
 	public function insert()
 	{
-		$ent = new M_GroupuserEntity();
-		$ent->GroupName = "Hehe";
-		$ent->Description = "Hehe";
+		$ent = new M_Groupusers();
+		$ent->GroupName = "Asw";
+		$ent->Description = "Njing";
 		$ent->save();
 		return view('test');
 	}
 
 	public function edit()
 	{
-		$ent = M_GroupuserEntity::get(20);
-		$ent->GroupName = "AWKAOWKOAWk";
-		$ent->Description = "AWKAOWKOAWk";
+		$ent = M_Groupusers::find(29);
+		$ent->GroupName = "Uwu";
+		$ent->Description = "Uwu";
 		$ent->save();
 		return view('test');
 	}
 
 	public function find(){
 		try{
-			$result = M_VillageEntity::getOrFail(1);
-				// echo get_class($result);
-				echo json_encode($result->get_list_M_Subvillage());
+			$result = M_Villages::findOrFail(1);
+			echo "<br>";
+			$params = [
+				'where' => [
+					'Id' => 1
+				]
+			];
+			$he = $result->hasMany('App\Eloquents\M_Subvillages', 'M_Village_Id', $params);
+			$result->Phone = '11111';
+			$result->save();
+			// echo get_class($result);
+			echo json_encode($result);
+			echo json_encode($he);
+			
 			
 		} catch(DbException $e){
 			echo $e->getMessage();
@@ -63,6 +73,11 @@ class Home extends BaseController
 			echo $e->getMessage();
 		}
 	}
+
+	public function builder(){
+		
+	}
+
 
 
 }
