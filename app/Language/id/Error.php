@@ -54,3 +54,4 @@ $lang =  [
     'failed_login' => "Login Gagal",
     'password_can_not_null' => "Password Tidak Boleh Kosong",
 ];
+return $lang;

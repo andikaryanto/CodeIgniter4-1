@@ -2,33 +2,36 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
-use App\Entities\M_GroupuserEntity;
-use Core\Nayo_Exception;
-use Core\Libraries\Datatables;
-use Core\Session;
+use App\Classes\Exception\EloquentException;
+use App\Eloquents\M_accessroles;
+use App\Controllers\Base_Controller;
+use App\Eloquents\R_reportaccessroles;
+use App\Libraries\Redirect;
+use App\Libraries\Session;
+use AndikAryanto11\Datatables;
+use App\Eloquents\M_groupusers;
 
-class M_groupuser extends BaseController
+class M_groupuser extends Base_Controller
 {
 
     public function __construct()
     {
-        // parent::__construct();
+        
     }
 
     public function index()
     {
 
-        // if ($this->hasPermission('m_groupuser', 'Read')) {
+        if ($this->hasPermission('m_groupuser', 'Read')) {
             $this->loadView('m_groupuser/index', lang('Form.groupuser'));
-        // }
+        }
     }
 
     public function add()
     {
 
         if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupusers = new M_GroupuserEntity();
+            $groupusers = new M_groupusers();
             $data = setPageData_paging($groupusers);
             $this->loadView('m_groupuser/add', lang('Form.groupuser'), $data);
         }
@@ -46,11 +49,11 @@ class M_groupuser extends BaseController
                 $groupusers->validate();
                 $groupusers->save();
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                redirect('mgroupuser/add')->go();
-            } catch (Nayo_Exception $e) {
+                return Redirect::redirect('mgroupuser/add')->go();
+            } catch (EloquentException $e) {
 
                 Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                redirect('mgroupuser/add')->with($groupusers)->go();
+                return Redirect::redirect('mgroupuser/add')->with($groupusers)->go();
             }
         }
     }
@@ -58,7 +61,7 @@ class M_groupuser extends BaseController
     public function edit($id)
     {
         if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupusers = M_groupusers::get($id);
+            $groupusers = M_groupusers::find($id);
             $data['model'] = $groupusers;
             $this->loadView('m_groupuser/edit', lang('Form.groupuser'), $data);
         }
@@ -67,9 +70,9 @@ class M_groupuser extends BaseController
     public function editsave()
     {
         if ($this->hasPermission('m_groupuser', 'Write')) {
-            $id = $this->request->post('Id');
+            $id = $this->request->getPost('Id');
 
-            $groupusers = M_groupusers::get($id);
+            $groupusers = M_groupusers::find($id);
             $oldmodel = clone $groupusers;
 
             $groupusers->parseFromRequest();
@@ -79,11 +82,11 @@ class M_groupuser extends BaseController
 
                 $groupusers->save();
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                redirect('mgroupuser')->go();
-            } catch (Nayo_Exception $e) {
+                return Redirect::redirect('mgroupuser')->go();
+            } catch (EloquentException $e) {
 
                 Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                redirect("mgroupuser/edit/{$id}")->with($groupusers)->go();
+                return Redirect::redirect("mgroupuser/edit/{$id}")->with($groupusers)->go();
             }
         }
     }
@@ -118,12 +121,12 @@ class M_groupuser extends BaseController
     public function saverole()
     {
         if ($this->hasPermission('m_groupuser', 'Write')) {
-            $formid = $this->request->post("formid");
-            $groupid = $this->request->post("groupid");
-            $read = $this->request->post("read");
-            $write = $this->request->post("write");
-            $delete = $this->request->post("delete");
-            $print = $this->request->post("print");
+            $formid = $this->request->getPost("formid");
+            $groupid = $this->request->getPost("groupid");
+            $read = $this->request->getPost("read");
+            $write = $this->request->getPost("write");
+            $delete = $this->request->getPost("delete");
+            $print = $this->request->getPost("print");
 
             $params = array(
                 'where' => array(
@@ -156,9 +159,9 @@ class M_groupuser extends BaseController
     public function savereportrole()
     {
         if ($this->hasPermission('m_groupuser', 'Write')) {
-            $reportid = $this->request->post("reportid");
-            $groupid = $this->request->post("groupid");
-            $read = $this->request->post("read");
+            $reportid = $this->request->getPost("reportid");
+            $groupid = $this->request->getPost("groupid");
+            $read = $this->request->getPost("read");
 
             $params = array(
                 'where' => array(
@@ -192,9 +195,9 @@ class M_groupuser extends BaseController
     public function delete()
     {
 
-        $id = $this->request->post("id");
+        $id = $this->request->getPost("id");
         if ($this->hasPermission('m_groupuser', 'Delete')) {
-            $model = M_groupusers::get($id);
+            $model = M_groupusers::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
                 $deletemsg = getDeleteErrorMessage();
@@ -215,11 +218,13 @@ class M_groupuser extends BaseController
 
         if ($this->hasPermission('m_groupuser', 'Read')) {
 
-            $datatable = new Datatables('M_groupusers');
+            $datatable = new Datatables();
+            $datatable->eloquent('App\\Eloquents\\M_groupusers');
             $datatable
                 ->addDtRowClass("rowdetail")
                 ->addColumn(
                     'Id',
+                    null,
                     function ($row) {
                         return $row->Id;
                     },
@@ -227,6 +232,7 @@ class M_groupuser extends BaseController
                     false
                 )->addColumn(
                     'GroupName',
+                    null,
                     function ($row) {
                         return
                             formLink($row->GroupName, array(
@@ -236,13 +242,16 @@ class M_groupuser extends BaseController
                             ));
                     }
                 )->addColumn(
-                    'Description'
+                    'Description',
+                    null,
                 )->addColumn(
                     'Created',
+                    null,
                     null,
                     false
                 )->addColumn(
                     'Action',
+                    null,
                     function ($row) {
                         return
                             formLink("<i class='fa fa-user'></i>", array(
@@ -275,11 +284,13 @@ class M_groupuser extends BaseController
     public function getDataModal()
     {
 
-        $datatable = new Datatables('M_groupusers');
+        $datatable = new Datatables();
+        $datatable->eloquent('App\\Eloquents\\M_groupusers');
         $datatable
             ->addDtRowClass("rowdetail")
             ->addColumn(
                 'Id',
+                null,
                 function ($row) {
                     return $row->Id;
                 },
@@ -287,6 +298,7 @@ class M_groupuser extends BaseController
                 false
             )->addColumn(
                 'GroupName',
+                null,
                 function ($row) {
                     return $row->GroupName;
                 }

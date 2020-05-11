@@ -1,83 +1,56 @@
-<?php namespace App\Controllers;
+<?php
+namespace App\Controllers;
+use App\Controllers\Base_Controller;
+use App\Eloquents\M_disasters;
+use App\Eloquents\T_disasteroccurs;
+use App\Libraries\Redirect;
+use App\Libraries\Session;
+use Core\Database\DBBuilder;
 
-use App\Classes\Exception\DbException;
-use App\Entities\M_GroupuserEntity;
-use CodeIgniter\Database\Exceptions\DatabaseException;
-use App\Controllers\BaseController;
-use App\Eloquents\M_Groupusers;
-use App\Eloquents\M_Villages;
-use App\Entities\M_ProvinceEntity;
+class Home extends Base_Controller{
+    
+    public function index(){
+        if(empty(Session::get(get_variable().'userdata'))){
+            Redirect::redirect('welcome')->go();
+        }
 
-class Home extends BaseController
-{
-	public function __construct()
-	{
-		
-	}
+        $currentyear= get_current_date("Y");
+        $datacurrentyear = $this->db->query("SELECT COUNT(b.id) Jumlah, b.`Name`
+        FROM t_disasteroccurs a
+        INNER JOIN m_disasters b ON b.`Id` = a.`M_Disaster_Id`
+        WHERE YEAR(a.`DateOccur`) = {$currentyear} 
+        GROUP BY b.`Name`")->getResult();
 
-	public function insert()
-	{
-		$ent = new M_Groupusers();
-		$ent->GroupName = "Asw";
-		$ent->Description = "Njing";
-		$ent->save();
-		return view('test');
-	}
+        $datefrom = get_formated_date($this->request->getGet("DateFrom"), "Y-m-d") . " 00:00:00";
+        $dateto = get_formated_date($this->request->getGet("DateTo"), "Y-m-d") . " 23:59:59";
+        
+        $disaster = $this->request->getGet("Disaster");
+        $status = $this->request->getGet("Status");
+        $params = [
+            'where' => [
+                'DateOccur >=' => $datefrom,
+                'DateOccur <=' => $dateto
+            ],
+            'whereIn' => [
+                'M_Disaster_Id' => $disaster,
+                'Status' => $status
 
-	public function edit()
-	{
-		$ent = M_Groupusers::find(29);
-		$ent->GroupName = "Uwu";
-		$ent->Description = "Uwu";
-		$ent->save();
-		return view('test');
-	}
-
-	public function find(){
-		try{
-			$result = M_Villages::findOrFail(1);
-			echo "<br>";
-			$params = [
-				'where' => [
-					'Id' => 1
-				]
-			];
-			$he = $result->hasMany('App\Eloquents\M_Subvillages', 'M_Village_Id', $params);
-			$result->Phone = '11111';
-			$result->save();
-			// echo get_class($result);
-			echo json_encode($result);
-			echo json_encode($he);
-			
-			
-		} catch(DbException $e){
-			echo $e->getMessage();
-		}
-	}
-	public function findAll(){
-		try{
-			// $params = [
-			// 	'limit' => [
-			// 		'page' => 1,
-			// 		'size' => 2
-			// 	]
-			// ];
-			$result = M_ProvinceEntity::getAll();
-			echo json_encode($result);
- 
-			// foreach($result as $r){
-			// 	echo $r->get_M_Village()->Name. "<br>";
-			// 	echo $r->get_M_Village()->get_M_Subdistrict()->Name. "<br>";
-			// }
-		} catch(DatabaseException $e){
-			echo $e->getMessage();
-		}
-	}
-
-	public function builder(){
-		
-	}
-
-
-
+            ]
+        ];
+        $model = T_disasteroccurs::findAll($params);
+        $title['title'] = lang('Form.welcome');
+        $data['input'] = [
+            "DateFrom" => get_formated_date($datefrom, "d-m-Y"),
+            "DateTo" => get_formated_date($dateto, "d-m-Y"),
+            "Disaster" => $disaster ? "[".implode(",", $disaster)."]" : array(),
+            "Status" => $status ? "[".implode(",", $status)."]" : array(),
+        ];
+        // echo \json_encode($data['input']);
+        $data['model'] = $model;
+        $data['datacurrentyear'] = $datacurrentyear;
+        $data['disaster'] = M_disasters::findAll();
+        // echo json_encode($data['model']);
+        
+        $this->loadView('home/home', "Home", $data);
+    }
 }

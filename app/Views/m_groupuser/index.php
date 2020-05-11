@@ -104,7 +104,7 @@
       "processing": true,
       "serverSide": true,
       ajax:{
-        url : "<?= base_url('mgroupuser/getAllData')?>",
+        url : "<?= base_url('M_groupuser/getAllData')?>",
         dataSrc : 'data'
       },
       stateSave: true

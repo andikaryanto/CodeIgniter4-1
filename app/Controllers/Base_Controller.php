@@ -16,10 +16,12 @@ namespace App\Controllers;
 
 use App\Entities\M_FormEntity;
 use App\Libraries\Helper;
+use App\Libraries\Redirect;
+use App\Libraries\Session;
 use CodeIgniter\Config\Services;
 use CodeIgniter\Controller;
 
-class BaseController extends Controller
+class Base_Controller extends Controller
 {
 
 	/**
@@ -29,7 +31,10 @@ class BaseController extends Controller
 	 *
 	 * @var array
 	 */
-	protected $helpers = [];
+    protected $helpers = [];
+    
+    public $db;
+    public $request;
 
 	/**
 	 * Constructor.
@@ -44,7 +49,11 @@ class BaseController extends Controller
 		//--------------------------------------------------------------------
 		// E.g.:
 		// $this->session = \Config\Services::session();
-		helper(['date','helper','paging','config','inflector','url']);
+        helper(['date','helper','paging','config','inflector','url', 'appurl', 'appform']);
+        $this->db = \Config\Database::connect();
+        $this->request = $request;
+        
+
 	}
 
 	public function loadView($url,  $title = "", $datas = array())
@@ -194,35 +203,38 @@ class BaseController extends Controller
         $menudata['menu'] .= $menuend;
         $menudata['title'] = $title;
 
-        // $session = Session::getInstance();
         $data = array();
-        // if($session->get('data')){
-        //     $sesdata = $session->get('data');
-        //     foreach($datas['model'] as $key => $model){
-        //         $datas['model']->$key = $sesdata[$key];
-        //     }
+        if(Session::get('data')){
+            $sesdata = Session::get('data');
+            foreach($datas['model'] as $key => $model){
+                $datas['model']->$key = $sesdata[$key];
+            }
 
-        //     $data = $datas;
-        // } else {
-        //     $data = $datas;
-		// }
+            $data = $datas;
+        } else {
+            $data = $datas;
+		}
 
-        echo view('shared/header', $menudata);
-        view($url, $data);
-        view('shared/footer', array());
+        $this->view('shared/header', $menudata);
+        $this->view($url, $data);
+        $this->view('shared/footer', array());
+    }
+
+    public function view($url, $data){
+        echo view($url, $data);
     }
 
 	public function hasPermission($form, $role)
     {
 		
         if (empty(Services::session()->get(get_variable() . 'userdata'))) {
-            redirect('welcome')->go();
+            return Redirect::redirect('welcome')->go();
         }
 
         if (isPermitted_paging($_SESSION[get_variable() . 'userdata']['M_Groupuser_Id'], form_paging()[$form], $role)) {
             return true;
         }
-        redirect("Forbidden")->go();
+        return Redirect::redirect("Forbidden")->go();
     }
 
 }

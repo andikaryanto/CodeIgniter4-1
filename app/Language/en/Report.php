@@ -4,3 +4,4 @@ $lang = [
     'submission_payment_summary' => "Submission Payment Summary",
     'submission_payment' => "Submission Payment",
 ];
+return $lang;

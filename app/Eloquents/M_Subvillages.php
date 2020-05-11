@@ -1,11 +1,12 @@
 <?php  
 namespace App\Eloquents;
 
-use App\Classes\Exception\EntityException;
+use App\Classes\Exception\EloquentException;
 use App\Libraries\ResponseCode;
-use CodeIgniter\Eloquent;
+use App\Eloquents\BaseEloquent;
+use Core\Nayo_Exception;
 
-class M_Subvillages extends Eloquent {
+class M_subvillages extends BaseEloquent {
 
 	public $Id;
 	public $M_Village_Id;
@@ -24,14 +25,15 @@ class M_Subvillages extends Eloquent {
 	public $Created;
 	public $Modified;
 
+    
     protected $table = "m_subvillages";
-    protected $primaryKey = "Id";
+    static $primaryKey = "Id";
 
     public function __construct(){
         parent::__construct();
 	}
 	
-	public function validate(M_Subvillages $oldmodel = null){
+	public function validate(self $oldmodel = null){
 
 		$nameexist = false;
         $warning = array();
@@ -57,12 +59,12 @@ class M_Subvillages extends Eloquent {
                 $nameexist = $this->isDataExist($params);
             }
             else{
-				throw new EntityException(lang('Error.name_can_not_null'), $this, ResponseCode::INVALID_DATA);
+				throw new EloquentException(lang('Error.name_can_not_null'), $this, ResponseCode::INVALID_DATA);
             }
         }
         if($nameexist)
         {
-			throw new EntityException(lang('Error.name_exist'), $this, ResponseCode::DATA_EXIST);
+			throw new EloquentException(lang('Error.name_exist'), $this, ResponseCode::DATA_EXIST);
         }
         
         return $warning;

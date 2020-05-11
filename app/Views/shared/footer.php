@@ -270,7 +270,37 @@
   // });
 </script>
 <script>
-  
+  <?php
+  if (App\Libraries\Session::has('success_msg')) {
+    $msg = App\Libraries\Session::getFlash('success_msg');
+    for ($i = 0; $i < count($msg); $i++) {
+      ?>
+      setNotification("<?= $msg[$i]; ?>", 2, "bottom", "right");
+  <?php
+    }
+  }
+
+  ?>
+  <?php
+  if (App\Libraries\Session::has('add_warning_msg')) {
+    $msg = App\Libraries\Session::getFlash('add_warning_msg');
+    for ($i = 0; $i < count($msg); $i++) {
+      ?>
+      setNotification("<?= $msg[$i]; ?>", 3, "bottom", "right");
+    <?php
+      }
+    }
+
+    if (App\Libraries\Session::has('edit_warning_msg')) {
+      $msg = App\Libraries\Session::getFlash('edit_warning_msg');
+      for ($i = 0; $i < count($msg); $i++) {
+        ?>
+      setNotification("<?= $msg[$i]; ?>", 3, "bottom", "right");
+  <?php
+    }
+  }
+
+  ?>
 </script>
 </body>
 

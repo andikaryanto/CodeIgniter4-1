@@ -3,9 +3,9 @@ namespace App\Eloquents;
 
 use App\Classes\Exception\EntityException;
 use App\Libraries\ResponseCode;
-use CodeIgniter\Eloquent;
+use App\Eloquents\BaseEloquent;
 
-class M_Villages extends Eloquent {
+class M_villages extends BaseEloquent {
 
 	public $Id;
 	public $M_Subdistrict_Id;
@@ -22,7 +22,7 @@ class M_Villages extends Eloquent {
 
     
     protected $table = "m_villages";
-    protected $primaryKey = "Id";
+    static $primaryKey = "Id";
 
     public function __construct(){
         parent::__construct();
