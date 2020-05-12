@@ -245,7 +245,7 @@ $routes->post($parent.'/getData', 'M_equipmentowner::getData');
 //     $routes->post($parent.'/getData', 'M_villagedisaster::getData');
 // });
 
-$parent='/mequipmentowner';
+$parent='/mimpact';
 $routes->group($parent, function ($routes) {
     $routes->get('/', 'M_impact::index');
 });
@@ -339,7 +339,7 @@ $routes->get($parent.'/getAllData', 'M_disasterschool::getAllData');
 $routes->get($parent.'/getDataModal', 'M_disasterschool::getDataModal');
 $routes->post($parent.'/getData', 'M_disasterschool::getData');
 
-$parent = '/mdisasterschool';
+$parent = '/minstance';
 $routes->group($parent, function ($routes) {
     $routes->get('/', 'M_instance::index');
 });
@@ -378,7 +378,7 @@ $routes->get($parent.'/getAllData', 'M_community::getAllData');
 $routes->get($parent.'/getDataModal', 'M_community::getDataModal');
 $routes->post($parent.'/getData', 'M_community::getData');
 
-$parent = '/mcommunity';
+$parent = '/mvolunteer';
 $routes->group($parent, function ($routes) {
     $routes->get('/', 'M_volunteer::index');
 });
@@ -404,7 +404,7 @@ $routes->get($parent.'/getAllData', 'M_uom::getAllData');
 $routes->get($parent.'/getDataModal', 'M_uom::getDataModal');
 $routes->post($parent.'/getData', 'M_uom::getData');
 
-$parent = '/muom';
+$parent = '/mwarehouse';
 $routes->group($parent, function ($routes) {
     $routes->get('/', 'M_warehouse::index');
 });

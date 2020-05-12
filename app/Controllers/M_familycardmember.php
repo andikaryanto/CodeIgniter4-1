@@ -62,7 +62,7 @@ class M_familycardmember extends Base_Controller
                 return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->with($familycardmembers)->go();
             }
         }
@@ -103,8 +103,8 @@ class M_familycardmember extends Base_Controller
                 return Redirect::redirect("mfamilycardmember/$familycardmembers->M_Familycard_Id")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mfamilycardmember/edit/$id")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mfamilycardmember/edit/$id")->with($e->getEntity())->go();
             }
         }
     }
@@ -147,6 +147,7 @@ class M_familycardmember extends Base_Controller
                 ->addDtRowClass("rowdetail")
                 ->addColumn(
                     'Id',
+                    null,
                     function ($row) {
                         return $row->Id;
                     },
@@ -154,6 +155,7 @@ class M_familycardmember extends Base_Controller
                     false
                 )->addColumn(
                     'CompleteName',
+                    null,
                     function ($row) {
                         return
                             formLink($row->CompleteName, array(
@@ -164,34 +166,40 @@ class M_familycardmember extends Base_Controller
                     }
                 )->addColumn(
                     'NIK',
+                    null,
                     function ($row) {
                         return $row->NIK;
                     }
                 )->addColumn(
                     'Gender',
+                    null,
                     function ($row) {
                         return M_enumdetails::findEnumName("Gender", $row->Gender);
                     },
                     false
                 )->addColumn(
                     'Relation',
+                    null,
                     function ($row) {
                         return M_enumdetails::findEnumName("FamilyRelation", $row->Relation);
                     },
                     false
                 )->addColumn(
                     'BirthPlace',
+                    null,
                     function ($row) {
                         return $row->BirthPlace;
                     },
                     false
                 )->addColumn(
                     'BirthDate',
+                    null,
                     function ($row) {
                         return $row->BirthDate;
                     }
                 )->addColumn(
                     'Action',
+                    null,
                     function ($row) {
                         return
                             formLink("<i class='fa fa-trash'></i>", array(

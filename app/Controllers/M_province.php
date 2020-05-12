@@ -23,7 +23,7 @@ class M_province extends Base_Controller
     {
 
         if ($this->hasPermission('m_province', 'Read')) {
-            $this->loadView('m_province', lang('Form.province'));
+            $this->loadView('m_province/index', lang('Form.province'));
         }
     }
 
@@ -51,8 +51,8 @@ class M_province extends Base_Controller
                 return Redirect::redirect('mprovince/add')->go();
                 
             } catch (EloquentException $e) { 
-                Session::setFlash('add_warning_msg', $e->messages);
-                return Redirect::redirect('mprovince/add')->with($e->data)->go();
+                Session::setFlash('add_warning_msg', $e->getMessages());
+                return Redirect::redirect('mprovince/add')->with($e->getEntity())->go();
             }
         }
     }
@@ -88,8 +88,8 @@ class M_province extends Base_Controller
                 DbTrans::commit();
                 return Redirect::redirect('mprovince')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', $e->messages);
-                return Redirect::redirect("mprovince/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', $e->getMessages());
+                return Redirect::redirect("mprovince/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

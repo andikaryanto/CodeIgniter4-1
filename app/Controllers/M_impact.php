@@ -50,7 +50,7 @@ class M_impact extends Base_Controller
                 return Redirect::redirect('mimpact/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mimpact/add")->with($impacts)->go();
             }
         }
@@ -221,6 +221,7 @@ class M_impact extends Base_Controller
             )
             ->addColumn(
                 'm_impactcategories.Name',
+                'M_Impactcategory_Id',
                 null,
                 null,
             );

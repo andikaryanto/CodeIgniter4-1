@@ -45,6 +45,9 @@ class M_user extends Base_Controller
             $model->parseFromRequest();
 
             try {
+                $model->IsLoggedIn = 0;
+                $model->Language = "id";
+                $model->IsActive = 1;
                 $model->validate();
                 $model->setPassword($model->Password);
                 $model->save();
@@ -52,8 +55,8 @@ class M_user extends Base_Controller
                 return Redirect::redirect('muser/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("muser/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("muser/add")->with($e->getEntity())->go();
             }
         }
     }

@@ -53,8 +53,8 @@ class M_village extends Base_Controller
                 return Redirect::redirect('mvillage/add')->with($villages)->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mvillage/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mvillage/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -88,8 +88,8 @@ class M_village extends Base_Controller
                 return Redirect::redirect('mvillage')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mvillage/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mvillage/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

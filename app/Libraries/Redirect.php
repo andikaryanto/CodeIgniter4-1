@@ -16,7 +16,7 @@ class Redirect {
     }
 
     public function with($data){
-        Session::set('data', $data);
+        Session::set('data', get_object_vars($data));
         return $this;
     }
 

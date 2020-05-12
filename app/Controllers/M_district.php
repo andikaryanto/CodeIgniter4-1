@@ -52,7 +52,7 @@ class M_district extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mdistrict/add')->with($districts)->go();
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mdistrict/add')->with($districts)->go();
             }
         }
@@ -85,7 +85,7 @@ class M_district extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mdistrict')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mdistrict/edit/{$id}")->with($districts)->go();
             }
         }
@@ -124,6 +124,7 @@ class M_district extends Base_Controller
                 ->addDtRowClass("rowdetail")
                 ->addColumn(
                     'Id',
+                    null,
                     function ($row) {
                         return $row->Id;
                     },
@@ -131,6 +132,7 @@ class M_district extends Base_Controller
                     false
                 )->addColumn(
                     'Name',
+                    null,
                     function ($row) {
                         return
                             formLink($row->Name, array(
@@ -141,6 +143,7 @@ class M_district extends Base_Controller
                     }
                 )->addColumn(
                     '',
+                    null,
                     function ($row) {
                         return $row->get_M_Province()->Name;
                     },
@@ -148,17 +151,20 @@ class M_district extends Base_Controller
                     false
                 )->addColumn(
                     'Description',
+                    null,
                     function ($row) {
                         return $row->Description;
                     }
                 )->addColumn(
                     'Created',
+                    null,
                     function ($row) {
                         return $row->Created;
                     },
                     false
                 )->addColumn(
                     'Action',
+                    null,
                     function ($row) {
                         return
                             formLink("<i class='fa fa-trash'></i>", array(

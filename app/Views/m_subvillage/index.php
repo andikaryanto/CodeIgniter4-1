@@ -27,62 +27,7 @@
               </div>
             </div>
           </div>
-          <!-- <div class="card-body">
-            <div id="accordion" role="tablist">
-              <div class="card-collapse">
-                <div class="card-header" role="tab" id="headingOne">
-                  <h5 class="mb-0">
-                    <a data-toggle="collapse" href="#advancesearch" aria-expanded="false" aria-controls="advancesearch" class="collapsed">
-                      <i class="fa fa-search"></i>
-                      Pencarian Lebih Lanjut
-                    </a>
-                  </h5>
-                </div>
-                <div id="advancesearch" class="collapse" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion" style="">
-
-                  <div class="card-body">
-                    <?= formOpen("") ?>
-                    <div class="row">
-                      <div class="col-6 col-md-3 col-sm-3">
-                        <?= formSelect(
-                          $searchdata,
-                          "Value",
-                          "Name",
-                          array(
-                            "id" => "Search",
-                            "class" => "selectpicker form-control",
-                            "name" => "Search"
-                          )
-                        ) ?>
-                      </div>
-                      <div class="col-6 col-md-3 col-sm-3">
-                        <?= formInput(
-                          array(
-                            "id" => "SearchValue",
-                            "type" => "text",
-                            "placeholder" => lang("Form.search"),
-                            "class" => "form-control",
-                            "name" => "SearchValue",
-                            "value" => ""
-                          )
-                        ) ?>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <?= formInput(
-                        array(
-                          "type" => "submit",
-                          "class" => "btn btn-primary",
-                          "value" => lang('Form.search'),
-                        )
-                      ) ?>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
+          
           <div class="card-body">
             <div class="table-responsive">
               <table id="tableGroupUser" style="width: 100%;" class="table table-striped table-no-bordered table-hover dataTable dtr-inline collapsed " role="grid">

@@ -54,7 +54,7 @@ class M_equipment extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mequipment/add')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mequipment/add')->with($equipments)->go();
             }
         }
@@ -91,7 +91,7 @@ class M_equipment extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mequipment')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mequipment/edit/{$id}")->with($equipments)->go();
             }
         }
@@ -125,11 +125,14 @@ class M_equipment extends Base_Controller
 
         if ($this->hasPermission('m_equipment', 'Read')) {
 
-            $datatable = new Datatables('M_equipments');
+            $datatable = new Datatables();
+            
+            $datatable->eloquent('App\\Eloquents\\M_equipments');
             $datatable
                 ->addDtRowClass("rowdetail")
                 ->addColumn(
                     'Id',
+                    null,
                     function ($row) {
                         return $row->Id;
                     },
@@ -137,6 +140,7 @@ class M_equipment extends Base_Controller
                     false
                 )->addColumn(
                     'Name',
+                    null,
                     function ($row) {
                         return
                             formLink($row->Name, array(
@@ -147,17 +151,20 @@ class M_equipment extends Base_Controller
                     }
                 )->addColumn(
                     'Description',
+                    null,
                     function ($row) {
                         return $row->Description;
                     }
                 )->addColumn(
                     'Created',
+                    null,
                     function ($row) {
                         return $row->Created;
                     },
                     false
                 )->addColumn(
                     'Action',
+                    null,
                     function ($row) {
                         return
                             formLink("<i class='fa fa-user-plus'></i>", array(
@@ -189,7 +196,7 @@ class M_equipment extends Base_Controller
             ]
         ];
         $datatable = new Datatables($params);
-        $datatable->eloquent('App\\Eloquents\\M_equipments');
+        $datatable->eloquent('App\\Eloquents\\M_equipmentowners');
         $datatable
             ->addDtRowClass("rowdetail")
             ->addColumn(

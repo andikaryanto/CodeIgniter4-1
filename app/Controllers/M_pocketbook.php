@@ -59,8 +59,8 @@ class M_pocketbook extends Base_Controller
                     throw new EloquentException($photo->getErrorMessage(), $pocketbooks, ResponseCode::INVALID_DATA);
                 }
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mpocketbook/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mpocketbook/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -107,7 +107,7 @@ class M_pocketbook extends Base_Controller
                     throw new EloquentException($photo->getErrorMessage(), $pocketbooks);
                 }
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mpocketbook/edit/{$id}")->with($pocketbooks)->go();
             }
         }

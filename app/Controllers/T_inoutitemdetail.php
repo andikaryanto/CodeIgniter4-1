@@ -69,8 +69,8 @@ class T_inoutitemdetail extends Base_Controller
                 return Redirect::redirect("tinoutitemdetail/add/{$inoutitemdetails->T_Inoutitem_Id}")->go();
             } catch (EloquentException $e){
                 
-                Session::setFlash('add_warning_msg', $e->messages);
-                return Redirect::redirect("tinoutitemdetail/add/{$inoutitemdetails->T_Inoutitem_Id}")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', $e->getMessages());
+                return Redirect::redirect("tinoutitemdetail/add/{$inoutitemdetails->T_Inoutitem_Id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -118,8 +118,8 @@ class T_inoutitemdetail extends Base_Controller
                 return Redirect::redirect("tinoutitemdetail/$inoutitemdetails->T_Inoutitem_Id")->go();
             }catch (EloquentException $e){
                 
-                Session::setFlash('edit_warning_msg', $e->messages);
-                return Redirect::redirect("tinoutitemdetail/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', $e->getMessages());
+                return Redirect::redirect("tinoutitemdetail/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

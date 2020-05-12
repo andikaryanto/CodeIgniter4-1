@@ -67,7 +67,7 @@ class M_disasterschool extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg',  array(0 => $e->messages));
+                Session::setFlash('add_warning_msg',  array(0 => $e->getMessages()));
                 return Redirect::redirect('mdisasterschool/add')->with($disasterschools)->go();
             }
         }
@@ -123,7 +123,7 @@ class M_disasterschool extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg',  array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg',  array(0 => $e->getMessages()));
                 return Redirect::redirect("mdisasterschool/edit/{$id}")->with($disasterschools)->go();
             }
         }

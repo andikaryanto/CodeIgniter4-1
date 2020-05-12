@@ -61,7 +61,7 @@ class M_familycardlivestock extends Base_Controller
                 return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->with($familycardlivestocks)->go();
             }
         }
@@ -100,7 +100,7 @@ class M_familycardlivestock extends Base_Controller
                 return Redirect::redirect("mfamilycardlivestock/$familycardlivestocks->M_Familycard_Id")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mfamilycardlivestock/edit/$id")->with($familycardlivestocks)->go();
             }
         }

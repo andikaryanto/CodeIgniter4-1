@@ -58,8 +58,8 @@ class M_disaster extends Base_Controller
                     throw new EloquentException($photo->getErrorMessage(), $disasters, ResponseCode::INVALID_DATA);
                 }
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mdisaster/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mdisaster/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -106,7 +106,7 @@ class M_disaster extends Base_Controller
                     throw new EloquentException($photo->getErrorMessage(), $disasters);
                 }
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mdisaster/edit/{$id}")->with($disasters)->go();
             }
         }

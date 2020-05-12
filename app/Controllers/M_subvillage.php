@@ -22,7 +22,6 @@ class M_subvillage extends Base_Controller
     {
         if ($this->hasPermission('m_subvillage', 'Read')) {
 
-
             $this->loadView('m_subvillage/index', lang('Form.subvillage'));
         }
     }
@@ -51,8 +50,8 @@ class M_subvillage extends Base_Controller
                 return Redirect::redirect('msubvillage/add')->with($subvillages)->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msubvillage/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msubvillage/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -88,8 +87,8 @@ class M_subvillage extends Base_Controller
                 return Redirect::redirect('msubvillage')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msubvillage/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msubvillage/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -211,7 +210,7 @@ class M_subvillage extends Base_Controller
                     true,
                     true
                 )->addColumn(
-                    'Created',
+                    'm_subvillages.Created',
                     null,
                     function ($row) {
                         return $row->Created;
@@ -284,6 +283,7 @@ class M_subvillage extends Base_Controller
                 false
             )->addColumn(
                 '',
+                null,
                 function ($row) {
                     return $row->get_M_Village()->get_M_Subdistrict()->get_M_District()->get_M_Province()->Name;
                 },

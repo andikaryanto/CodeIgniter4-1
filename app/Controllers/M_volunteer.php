@@ -52,8 +52,8 @@ class M_volunteer extends Base_Controller
                 return Redirect::redirect('mvolunteer/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mvolunteer/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mvolunteer/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -88,8 +88,8 @@ class M_volunteer extends Base_Controller
                 return Redirect::redirect('mvolunteer')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mvolunteer/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mvolunteer/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -131,7 +131,7 @@ class M_volunteer extends Base_Controller
                     ],
                     'm_capabilities' => [
                         [
-                            'column' => 'm_volunteers.M_Capability_Id = m_capabilities.Id',
+                            'key' => 'm_volunteers.M_Capability_Id = m_capabilities.Id',
                             'type' => 'left',
                         ]
                     ]

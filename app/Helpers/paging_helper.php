@@ -37,6 +37,7 @@ function form_paging(){
         't_itemtransfer' => 't_itemtransfers',
         't_itemreceiving' => 't_itemreceivings',
 
+        'm_province' => 'm_provinces',
         'm_district' => 'm_districts',
         'm_subdistrict' => 'm_subdistricts',
         'm_formsetting' => 'm_formsettings',
@@ -67,6 +68,7 @@ function form_paging(){
         'm_userlocation' => 'm_userlocations',
         'm_company' => 'm_companies',
         'm_pocketbook' => 'm_pocketbooks',
+        't_disasterassessment' => 't_disasterassessments',
     );
     return $data;
 }

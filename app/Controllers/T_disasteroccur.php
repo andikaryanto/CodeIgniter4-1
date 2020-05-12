@@ -123,9 +123,9 @@ class T_disasteroccur extends Base_Controller
                         throw new EloquentException($video->getErrorMessage(), $disasteroccurs);
                 }
             } catch (EloquentException $e) {
-                $e->data->DateOccur = get_formated_date($e->data->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasteroccur/add")->with($e->data)->go();
+                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasteroccur/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -203,9 +203,9 @@ class T_disasteroccur extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                $e->data->DateOccur = get_formated_date($e->data->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasteroccur/edit/{$id}")->with($e->data)->go();
+                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasteroccur/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

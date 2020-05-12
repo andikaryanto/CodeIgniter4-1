@@ -49,8 +49,8 @@ class M_uom extends Base_Controller
                 return Redirect::redirect('muom/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("muom/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("muom/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -85,8 +85,8 @@ class M_uom extends Base_Controller
                 return Redirect::redirect('muom')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("muom/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("muom/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

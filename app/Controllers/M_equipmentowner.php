@@ -62,7 +62,7 @@ class M_equipmentowner extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->go();
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->with($equipmentowners)->go();
             }
         }
@@ -101,7 +101,7 @@ class M_equipmentowner extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect("mequipmentowner/$equipmentowners->M_Equipment_Id")->go();
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mequipmentowner/edit/{$id}")->with($equipmentowners)->go();
             }
         }

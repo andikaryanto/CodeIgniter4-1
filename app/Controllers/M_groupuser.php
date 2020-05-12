@@ -52,7 +52,7 @@ class M_groupuser extends Base_Controller
                 return Redirect::redirect('mgroupuser/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mgroupuser/add')->with($groupusers)->go();
             }
         }
@@ -85,7 +85,7 @@ class M_groupuser extends Base_Controller
                 return Redirect::redirect('mgroupuser')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mgroupuser/edit/{$id}")->with($groupusers)->go();
             }
         }

@@ -7,9 +7,3 @@ class T_inoutitemsStatus {
     const RELEASE = 2;
     const CANCEL = 3;
 }
-
-class T_inoutitemsType {
-
-    const IN = 1;
-    const OUT = 2;
-}

@@ -20,9 +20,12 @@ class M_capability extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_capability', 'Read')) {
+        $res = $this->hasPermission('m_capability', 'Read');
+        if (is_bool($res)) {
 
             $this->loadView('m_capability/index', lang('Form.capability'));
+        } else {
+            return $res;
         }
     }
 
@@ -42,10 +45,10 @@ class M_capability extends Base_Controller
 
             $capabilities = new M_capabilities();
             $capabilities->parseFromRequest();
-            $capabilities->validate();
 
             DbTrans::beginTransaction();
             try {
+                $capabilities->validate();
                 $capabilities->save();
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 DbTrans::commit();
@@ -53,8 +56,8 @@ class M_capability extends Base_Controller
                 // }
             } catch (EloquentException $e) {
                 DbTrans::rollback();
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect('mcapability/add')->with($capabilities)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect('mcapability/add')->with($e->getEntity())->go();
             }
         }
     }
@@ -89,7 +92,7 @@ class M_capability extends Base_Controller
                 return Redirect::redirect("mcapability")->go();
                 
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mcapability/edit/$id")->with($capabilities)->go();
             }
         }

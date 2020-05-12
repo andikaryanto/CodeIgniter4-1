@@ -43,11 +43,6 @@
 <script src="<?= base_url('assets/bootstrapdashboard/vendor/bootstrap/js/plugins/summernote-bs4.min.js'); ?>"></script>
 <!-- Main File-->
 <script src="<?= base_url('assets/bootstrapdashboard/js/front.js'); ?>"></script>
-<!-- <script src="https://www.gstatic.com/firebasejs/6.6.2/firebase.js"></script> -->
-<script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-messaging.js"></script>
-<script src="<?= base_url('assets/js/firebaseclient.js'); ?>"></script>
-<script src="<?= base_url('assets/js/firebase-messaging-sw.js'); ?>"></script>
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
 

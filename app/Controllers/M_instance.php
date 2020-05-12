@@ -48,8 +48,8 @@ class M_instance extends Base_Controller
                 return Redirect::redirect('minstance/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("minstance/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("minstance/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -83,8 +83,8 @@ class M_instance extends Base_Controller
                 return Redirect::redirect('minstance')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("minstance/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("minstance/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

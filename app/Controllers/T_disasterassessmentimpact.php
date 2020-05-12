@@ -61,8 +61,8 @@ class T_disasterassessmentimpact extends Base_Controller
                 return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -103,8 +103,8 @@ class T_disasterassessmentimpact extends Base_Controller
                 return Redirect::redirect("tdisasterassessmentimpact/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasterassessmentimpact/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasterassessmentimpact/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

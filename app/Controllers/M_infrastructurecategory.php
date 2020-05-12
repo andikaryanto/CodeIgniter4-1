@@ -57,8 +57,8 @@ class M_infrastructurecategory extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("minfrastructurecategory/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("minfrastructurecategory/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -100,8 +100,8 @@ class M_infrastructurecategory extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("minfrastructurecategory/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("minfrastructurecategory/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

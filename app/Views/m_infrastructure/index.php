@@ -38,7 +38,7 @@
                 <div class="form-group">
                   <?= formLabel(lang("Form.infrastructurecategory")) ?>
                   <?= formSelect(
-                    App\Models\M_infrastructurecategories::getAll(),
+                    App\Eloquents\M_infrastructurecategories::findAll(),
                     "Id",
                     "Name",
                     array(

@@ -51,7 +51,7 @@ class M_community extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mcommunity/add')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mcommunity/add')->with($communities)->go();
             }
         }
@@ -88,7 +88,7 @@ class M_community extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mcommunity')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mcommunity/edit/{$id}")->with($communities)->go();
             }
         }

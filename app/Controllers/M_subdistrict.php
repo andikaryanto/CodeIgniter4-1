@@ -53,8 +53,8 @@ class M_subdistrict extends Base_Controller
                 return Redirect::redirect('msubdistrict/add')->with($subdistricts)->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msubdistrict/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msubdistrict/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -88,8 +88,8 @@ class M_subdistrict extends Base_Controller
                 return Redirect::redirect('msubdistrict')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msubdistrict/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msubdistrict/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -154,6 +154,7 @@ class M_subdistrict extends Base_Controller
                     false
                 )->addColumn(
                     '',
+                    null,
                     function ($row) {
                         return $row->get_M_District()->get_M_Province()->Name;
                     },

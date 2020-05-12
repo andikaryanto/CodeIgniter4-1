@@ -23,6 +23,7 @@ class M_infrastructure extends Base_Controller
 
     public function index()
     {
+        
         if ($this->hasPermission('m_infrastructure', 'Read')) {
 
             $disaster = $this->request->getGet("Category");
@@ -31,8 +32,7 @@ class M_infrastructure extends Base_Controller
                 'join' => [
                     'm_infrastructurecategories' => [
                         [
-                            'table' => 'm_infrastructures',
-                            'column' => 'M_Infrastructurecategory_Id',
+                            'key' => 'm_infrastructures.M_Infrastructurecategory_Id = m_infrastructurecategories.Id',
                             'type' => 'left'
                         ]
                     ]
@@ -87,8 +87,8 @@ class M_infrastructure extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("minfrastructure/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("minfrastructure/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -177,14 +177,14 @@ class M_infrastructure extends Base_Controller
                 'join' => [
                     'm_infrastructurecategories' => [
                         [
-                        'table' => 'm_infrastructures',
-                        'column' => 'M_Infrastructurecategory_Id',
+                        'key' => 'm_infrastructures.M_Infrastructurecategory_Id = m_infrastructurecategories.Id',
                         'type' => 'left']
                     ]
                 ]
             ];
 
-            $datatable = new Datatables('M_infrastructures', $params);
+            $datatable = new Datatables($params);
+            $datatable->eloquent('App\\Eloquents\\M_infrastructures');
             $datatable
                 ->addDtRowClass("rowdetail")
                 ->addColumn(

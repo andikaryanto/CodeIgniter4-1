@@ -48,8 +48,8 @@ class M_livestock extends Base_Controller
                 return Redirect::redirect('mlivestock/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mlivestock/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mlivestock/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -84,8 +84,8 @@ class M_livestock extends Base_Controller
                 return Redirect::redirect('mlivestock')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mlivestock/edit/{$livestocks}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mlivestock/edit/{$livestocks}")->with($e->getEntity())->go();
             }
         }
     }

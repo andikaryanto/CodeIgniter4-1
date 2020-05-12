@@ -67,9 +67,9 @@
     </div>
   </div>
 </section>
-<?= $this->view("modal/image") ?>
-<?= $this->view("modal/video") ?>
-<?= $this->view("modal/map") ?>
+<?= view("modal/image") ?>
+<?= view("modal/video") ?>
+<?= view("modal/map") ?>
 
 <script>
   $(document).ready(function() {

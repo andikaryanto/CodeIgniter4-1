@@ -50,8 +50,8 @@ class M_safedistance extends Base_Controller
                 return Redirect::redirect('msafedistance/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msafedistance/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msafedistance/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -86,8 +86,8 @@ class M_safedistance extends Base_Controller
                 return Redirect::redirect('msafedistance')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("msafedistance/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("msafedistance/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

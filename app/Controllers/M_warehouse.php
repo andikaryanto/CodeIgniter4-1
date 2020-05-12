@@ -54,8 +54,8 @@ class M_warehouse extends Base_Controller
                 return Redirect::redirect('mwarehouse/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mwarehouse/add")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mwarehouse/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -89,8 +89,8 @@ class M_warehouse extends Base_Controller
                 return Redirect::redirect('mwarehouse')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("mwarehouse/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("mwarehouse/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

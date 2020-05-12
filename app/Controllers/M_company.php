@@ -52,7 +52,7 @@ class M_company extends Base_Controller
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mcompany')->go();
             } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 // echo json_encode($e);
                 return Redirect::redirect("mcompany")->go();
             }
@@ -101,7 +101,7 @@ class M_company extends Base_Controller
                     throw new EloquentException($photo->getErrorMessage(), $companies);
                 }
             } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect("mcompany/edit/{$id}")->with($companies)->go();
             }
         }

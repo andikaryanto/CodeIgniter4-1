@@ -50,7 +50,7 @@ class M_familycard extends Base_Controller
                 return Redirect::redirect('mfamilycard/add')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mfamilycard/add')->with($familycards)->go();
             }
         }
@@ -85,7 +85,7 @@ class M_familycard extends Base_Controller
                 return Redirect::redirect('mfamilycard')->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
                 return Redirect::redirect('mfamilycard')->with($familycards)->go();
             }
         }

@@ -66,9 +66,9 @@ class T_inoutitem extends Base_Controller
             } catch (EloquentException $e) {
 
                 DbTrans::rollback();
-                $e->data->Date = get_formated_date($e->data->Date, 'd-m-Y');
-                Session::setFlash('add_success_msg', $e->messages);
-                return Redirect::redirect("tinoutitem/add")->with($e->data)->go();
+                $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
+                Session::setFlash('add_success_msg', $e->getMessages());
+                return Redirect::redirect("tinoutitem/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -110,9 +110,9 @@ class T_inoutitem extends Base_Controller
 
             } catch (EloquentException $e) {
                 DbTrans::rollback();
-                $e->data->Date = get_formated_date($e->data->Date, 'd-m-Y');
-                Session::setFlash('edit_warning_msg', $e->messages);
-                return Redirect::redirect("tinoutitem/edit/{$id}")->with($e->data)->go();
+                $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
+                Session::setFlash('edit_warning_msg', $e->getMessages());
+                return Redirect::redirect("tinoutitem/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

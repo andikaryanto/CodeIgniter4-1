@@ -92,9 +92,9 @@ class T_disasterreport extends Base_Controller
             }
         } catch (EloquentException $e) {
 
-            $e->data->DateOccur = get_formated_date($e->data->DateOccur, 'd-m-Y H:i');
-            Session::setFlash('add_warning_msg', array(0 => $e->messages));
-            return Redirect::redirect("disasterreport")->with($e->data)->go();
+            $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("disasterreport")->with($e->getEntity())->go();
         }
     }
 
@@ -146,9 +146,9 @@ class T_disasterreport extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                $e->data->DateOccur = get_formated_date($e->data->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasterreport/add")->with($e->data)->go();
+                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasterreport/add")->with($e->getEntity())->go();
             }
         }
     }
@@ -222,8 +222,8 @@ class T_disasterreport extends Base_Controller
                 }
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasterreport/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasterreport/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -262,6 +262,7 @@ class T_disasterreport extends Base_Controller
                 ->addDtRowClass("rowdetail")
                 ->addColumn(
                     'Id',
+                    null,
                     function ($row) {
                         return $row->Id;
                     },
@@ -269,6 +270,7 @@ class T_disasterreport extends Base_Controller
                     false
                 )->addColumn(
                     'ReportNo',
+                    null,
                     function ($row) {
                         return
                             formLink($row->ReportNo, array(
@@ -279,42 +281,49 @@ class T_disasterreport extends Base_Controller
                     }
                 )->addColumn(
                     'M_Community_Id',
+                    null,
                     function ($row) {
                         return $row->get_M_Community()->Name;
                     },
                     false
                 )->addColumn(
                     'ReporterName',
+                    null,
                     function ($row) {
                         return $row->ReporterName;
                     },
                     false
                 )->addColumn(
                     'Phone',
+                    null,
                     function ($row) {
                         return $row->Phone;
                     },
                     false
                 )->addColumn(
                     'M_Subvillage_Id',
+                    null,
                     function ($row) {
                         return $row->get_M_Subvillage()->Name;
                     },
                     false
                 )->addColumn(
                     'M_Disaster_Id',
+                    null,
                     function ($row) {
                         return $row->get_M_Disaster()->Name;
                     },
                     false
                 )->addColumn(
                     'DateOccur',
+                    null,
                     function ($row) {
                         return get_formated_date($row->DateOccur, "d-m-Y H:i");
                     },
                     false
                 )->addColumn(
                     'Action',
+                    null,
                     function ($row) {
                         $append = "";
                         if(!$row->isAssessed()){

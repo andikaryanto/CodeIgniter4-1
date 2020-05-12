@@ -61,8 +61,8 @@ class T_disasteroccurimpact extends Base_Controller
                 return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->with($e->data)->go();
+                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->with($e->getEntity())->go();
             }
         }
     }
@@ -102,8 +102,8 @@ class T_disasteroccurimpact extends Base_Controller
                 return Redirect::redirect("tdisasteroccurimpact/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
             } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->messages));
-                return Redirect::redirect("tdisasteroccurimpact/edit/{$id}")->with($e->data)->go();
+                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+                return Redirect::redirect("tdisasteroccurimpact/edit/{$id}")->with($e->getEntity())->go();
             }
         }
     }

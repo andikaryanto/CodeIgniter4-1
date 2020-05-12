@@ -49,7 +49,7 @@ class Base_Controller extends Controller
 		//--------------------------------------------------------------------
 		// E.g.:
 		// $this->session = \Config\Services::session();
-        helper(['date','helper','paging','config','inflector','url', 'appurl', 'appform']);
+        helper(['date','helper','paging','config','inflector','url', 'html', 'appurl', 'appform']);
         $this->db = \Config\Database::connect();
         $this->request = $request;
         
@@ -206,21 +206,26 @@ class Base_Controller extends Controller
         $data = array();
         if(Session::get('data')){
             $sesdata = Session::get('data');
-            foreach($datas['model'] as $key => $model){
-                $datas['model']->$key = $sesdata[$key];
-            }
+            if(!empty($sesdata))
+                foreach($datas['model'] as $key => $model){
+                    if(isset($sesdata[$key]))
+                        $datas['model']->$key = $sesdata[$key];
+                }
 
             $data = $datas;
         } else {
             $data = $datas;
 		}
 
-        $this->view('shared/header', $menudata);
-        $this->view($url, $data);
+        $this->view('shared/header', $menudata, false);
+        $this->view($url, $data, false);
         $this->view('shared/footer', array());
     }
 
-    public function view($url, $data){
+    public function view($url, $data, $clearData = true){
+        if($clearData){
+            Session::remove('data');
+        }
         echo view($url, $data);
     }
 
