@@ -118,11 +118,11 @@
                     <span class="d-none d-sm-inline-block"></span>
                   </a>
                   <ul aria-labelledby="languages" class="dropdown-menu">
-                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url().'changeLanguage';?>?language=id"> 
+                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url('changeLanguage');?>?language=id"> 
                       <img src="<?=  base_url().'/assets/bootstrapdashboard/img/flags/16/ID.png';?>" alt="Indonesia" class="mr-2">
                       <span>Indonesia</span></a>
                     </li>
-                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url().'changeLanguage';?>?language=en"> 
+                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url('changeLanguage');?>?language=en"> 
                       <img src="<?=  base_url().'/assets/bootstrapdashboard/img/flags/16/US.png';?>" alt="English" class="mr-2">
                       <span>English</span></a>
                     </li>
@@ -135,11 +135,11 @@
                     <span class="d-none d-sm-inline-block"></span>
                   </a>
                   <ul aria-labelledby="profile" class="dropdown-menu">
-                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url().'changePassword';?>"> 
+                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url('changePassword');?>"> 
                       <i class="fa fa-edit"></i>
                       <span><?= lang("Form.changepassword")?></span></a>
                     </li>
-                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url().'login/dologout';?>"> 
+                    <li><a rel="nofollow" class="dropdown-item" href ="<?=  base_url('login/dologout');?>"> 
                       <i class="fa fa-sign-out-alt"></i>
                       <span><?= lang("Form.logout")?></span></a>
                     </li>

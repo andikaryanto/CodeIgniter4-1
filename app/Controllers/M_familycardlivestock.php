@@ -20,90 +20,101 @@ class M_familycardlivestock extends Base_Controller
 
     public function index($idfamilycard)
     {
-        if ($this->hasPermission('m_familycard', 'Read')) {
-
-            $result = M_familycards::find($idfamilycard);
-            $data['model'] = $result;
-
-            $this->loadView('m_familycardlivestock/index', lang('Form.familycardlivestock'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = M_familycards::find($idfamilycard);
+        $data['model'] = $result;
+
+        $this->loadView('m_familycardlivestock/index', lang('Form.familycardlivestock'), $data);
+        
     }
 
     public function add($idfamilycard)
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $result = M_familycards::find($idfamilycard);
-
-            $familycardlivestocks = new M_familycardlivestocks();
-
-            $data = setPageData_paging($familycardlivestocks);
-
-            $data['familycard'] = $result;
-            $this->loadView('m_familycardlivestock/add', lang('Form.familycardlivestock'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = M_familycards::find($idfamilycard);
+
+        $familycardlivestocks = new M_familycardlivestocks();
+
+        $data = setPageData_paging($familycardlivestocks);
+
+        $data['familycard'] = $result;
+        $this->loadView('m_familycardlivestock/add', lang('Form.familycardlivestock'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-
-            $familycardlivestocks = new M_familycardlivestocks();
-            $familycardlivestocks->parseFromRequest();
-
-            try {
-                $familycardlivestocks->validate();
-
-                $familycardlivestocks->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->with($familycardlivestocks)->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $familycardlivestocks = new M_familycardlivestocks();
+        $familycardlivestocks->parseFromRequest();
+
+        try {
+            $familycardlivestocks->validate();
+
+            $familycardlivestocks->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mfamilycardlivestock/add/{$familycardlivestocks->M_Familycard_Id}")->with($familycardlivestocks)->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-
-            $familycardlivestocks = M_familycardlivestocks::find($id);
-
-            $result = M_familycards::find($familycardlivestocks->M_Familycard_Id);
-
-            $data['model'] = $familycardlivestocks;
-            $data['familycard'] = $result;
-            $this->loadView('m_familycardlivestock/edit', lang('Form.familycardlivestock'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $familycardlivestocks = M_familycardlivestocks::find($id);
+
+        $result = M_familycards::find($familycardlivestocks->M_Familycard_Id);
+
+        $data['model'] = $familycardlivestocks;
+        $data['familycard'] = $result;
+        $this->loadView('m_familycardlivestock/edit', lang('Form.familycardlivestock'), $data);
+    
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $familycardlivestocks = M_familycardlivestocks::find($id);
-            $oldmodel = clone $familycardlivestocks;
-
-            $familycardlivestocks->parseFromRequest();
-            try {
-                $familycardlivestocks->validate($oldmodel);
-                $familycardlivestocks->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mfamilycardlivestock/$familycardlivestocks->M_Familycard_Id")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mfamilycardlivestock/edit/$id")->with($familycardlivestocks)->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $familycardlivestocks = M_familycardlivestocks::find($id);
+        $oldmodel = clone $familycardlivestocks;
+
+        $familycardlivestocks->parseFromRequest();
+        try {
+            $familycardlivestocks->validate($oldmodel);
+            $familycardlivestocks->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mfamilycardlivestock/$familycardlivestocks->M_Familycard_Id")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mfamilycardlivestock/edit/$id")->with($familycardlivestocks)->go();
+        }
+    
     }
 
 
@@ -111,7 +122,11 @@ class M_familycardlivestock extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_familycard', 'Delete')) {
+        $res = $this->hasPermission('m_familycard', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_familycardlivestocks::find($id);
             $result = $model->delete();
@@ -124,8 +139,6 @@ class M_familycardlivestock extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

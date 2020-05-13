@@ -21,85 +21,100 @@ class M_user extends Base_Controller
     public function index()
     {
 
-        if ($this->hasPermission('m_user', 'Read')) {
-
-            $this->loadView('m_user/index', lang('Form.user'));
+        $res = $this->hasPermission('m_user', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_user/index', lang('Form.user'));
+        
     }
 
     public function add()
     {
 
-        if ($this->hasPermission('m_user', 'Write')) {
-            $users = new M_users();
-            $data['model'] = $users;
-            $this->loadView('m_user/add', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_user', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $users = new M_users();
+        $data['model'] = $users;
+        $this->loadView('m_user/add', lang('Form.groupuser'), $data);
+    
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_user', 'Write')) {
-            $model = new M_users();
-            $model->parseFromRequest();
-
-            try {
-                $model->IsLoggedIn = 0;
-                $model->Language = "id";
-                $model->IsActive = 1;
-                $model->validate();
-                $model->setPassword($model->Password);
-                $model->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('muser/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("muser/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_user', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $model = new M_users();
+        $model->parseFromRequest();
+
+        try {
+            $model->IsLoggedIn = 0;
+            $model->Language = "id";
+            $model->IsActive = 1;
+            $model->validate();
+            $model->setPassword($model->Password);
+            $model->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('muser/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("muser/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
 
-        if ($this->hasPermission('m_user', 'Write')) {
-            $users = M_users::find($id);
-            $data['model'] = $users;
-            $this->loadView('m_user/edit', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_user', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $users = M_users::find($id);
+        $data['model'] = $users;
+        $this->loadView('m_user/edit', lang('Form.groupuser'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_user', 'Write')) {
-            $userid    = $this->request->getGetPost('userid');
-            $groupid    = $this->request->getGetPost('groupid');
-            $username   = $this->request->getGetPost('named');
-            $password   = $this->request->getGetPost('password');
-
-            $model = M_users::find($userid);
-            $oldmodel = clone $model;
-
-            $model->M_Groupuser_Id = $groupid;
-            $model->Username = $username;
-            $model->CreatedBy = $_SESSION[get_variable() . 'userdata']['Username'];
-
-            $validate = $model->validate($oldmodel);
-            if ($validate) {
-
-                $data = setPageData_paging($model);
-                Session::setFlash('edit_warning_msg', $validate);
-                $this->loadView('m_user/edit', $data);
-            } else {
-
-                $model->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('muser');
-            }
+        $res = $this->hasPermission('m_user', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $userid    = $this->request->getGetPost('userid');
+        $groupid    = $this->request->getGetPost('groupid');
+        $username   = $this->request->getGetPost('named');
+        $password   = $this->request->getGetPost('password');
+
+        $model = M_users::find($userid);
+        $oldmodel = clone $model;
+
+        $model->M_Groupuser_Id = $groupid;
+        $model->Username = $username;
+        $model->CreatedBy = $_SESSION[get_variable() . 'userdata']['Username'];
+
+        $validate = $model->validate($oldmodel);
+        if ($validate) {
+
+            $data = setPageData_paging($model);
+            Session::setFlash('edit_warning_msg', $validate);
+            $this->loadView('m_user/edit', $data);
+        } else {
+
+            $model->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('muser');
+        }
+        
     }
 
     public function getAllData()

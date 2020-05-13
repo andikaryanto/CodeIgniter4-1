@@ -115,14 +115,14 @@
         $tr = $(this).closest('tr');
         var data = table.row($tr).data();
         var id = data['Id'] + "~a";
-        var name = document.getElementById(id).innerHTML;
+        var name = data['GroupName'];
         deleteData(name, function(result){
           if (result==true)
           {
             $.ajax({
               type : "POST",
               url : "<?= base_url('mgroupuser/delete/');?>",
-              data : {id : data[0]},
+              data : {id : data['Id']},
               success : function(data){
                 console.log(data);
                 var status = $.parseJSON(data);
@@ -155,14 +155,14 @@
         var data = table.row($tr).data();;
         var id = data["Id"];
         console.log(data);
-        window.location = "<?= base_url('mgroupuser/editrole/');?>" + id;
+        window.location = "<?= base_url('mgroupuser/editrole/');?>" +"/"+ id;
     });
 
     table.on( 'click', '.reportrole', function () {
         $tr = $(this).closest('tr');
         var data = table.row($tr).data();;
         var id = data[0];
-        window.location = "<?= base_url('mgroupuser/editreportrole/');?>" + id;
+        window.location = "<?= base_url('mgroupuser/editreportrole/');?>" +"/"+ id;
     });
   }
 

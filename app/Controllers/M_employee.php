@@ -20,75 +20,89 @@ class M_employee extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_employee', 'Read')) {
-            $this->loadView('m_employee/index', lang('Form.employee'));
+        $res = $this->hasPermission('m_employee', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_employee/index', lang('Form.employee'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_employee', 'Write')) {
-            $employees = new M_employees();
-            $data = setPageData_paging($employees);
-            $this->loadView('m_employee/add', lang('Form.employee'), $data);
+        $res = $this->hasPermission('m_employee', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $employees = new M_employees();
+        $data = setPageData_paging($employees);
+        $this->loadView('m_employee/add', lang('Form.employee'), $data);
+    
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_employee', 'Write')) {
-            $employees = new M_employees();
-            $employees->parseFromRequest();
-
-            $validate = $employees->validate();
-            if ($validate) {
-
-                Session::setFlash('add_warning_msg', $validate);
-                return Redirect::redirect('memployee/add')->with($employees)->go();
-            } else {
-
-                $employees->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('memployee/add')->go();
-            }
+        $res = $this->hasPermission('m_employee', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $employees = new M_employees();
+        $employees->parseFromRequest();
+
+        $validate = $employees->validate();
+        if ($validate) {
+
+            Session::setFlash('add_warning_msg', $validate);
+            return Redirect::redirect('memployee/add')->with($employees)->go();
+        } else {
+
+            $employees->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('memployee/add')->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_employee', 'Write')) {
-
-            $employees = M_employees::find($id);
-            $data['model'] = $employees;
-            $this->loadView('m_employee/edit', lang('Form.employee'), $data);
+        $res = $this->hasPermission('m_employee', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $employees = M_employees::find($id);
+        $data['model'] = $employees;
+        $this->loadView('m_employee/edit', lang('Form.employee'), $data);
+    
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_employee', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-
-            $employees = M_employees::find($id);
-            $oldmodel = clone $employees;
-
-            $employees->parseFromRequest();
-
-            $validate = $employees->validate($oldmodel);
-            if ($validate) {
-
-                Session::setFlash('edit_warning_msg', $validate);
-                return Redirect::redirect("memployee/edit/{$id}")->with($employees)->go();
-            } else {
-
-                $employees->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("memployee")->go();
-            }
+        $res = $this->hasPermission('m_employee', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+
+        $employees = M_employees::find($id);
+        $oldmodel = clone $employees;
+
+        $employees->parseFromRequest();
+
+        $validate = $employees->validate($oldmodel);
+        if ($validate) {
+
+            Session::setFlash('edit_warning_msg', $validate);
+            return Redirect::redirect("memployee/edit/{$id}")->with($employees)->go();
+        } else {
+
+            $employees->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("memployee")->go();
+        }
+        
     }
 
 
@@ -96,7 +110,11 @@ class M_employee extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_employee', 'Delete')) {
+        $res = $this->hasPermission('m_employee', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_employees::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -108,9 +126,7 @@ class M_employee extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

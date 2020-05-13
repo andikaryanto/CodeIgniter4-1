@@ -21,95 +21,108 @@ class M_disaster extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_disaster', 'Read')) {
-
-            $this->loadView('m_disaster/index', lang('Form.disaster'));
+        $res = $this->hasPermission('m_disaster', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_disaster/index', lang('Form.disaster'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_disaster', 'Write')) {
-            $disasters = new M_disasters();
-            $data = setPageData_paging($disasters);
-            $this->loadView('m_disaster/add', lang('Form.disaster'), $data);
+        $res = $this->hasPermission('m_disaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasters = new M_disasters();
+        $data = setPageData_paging($disasters);
+        $this->loadView('m_disaster/add', lang('Form.disaster'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_disaster', 'Write')) {
-
-            $disasters = new M_disasters();
-            $disasters->parseFromRequest();
-            try {
-                $disasters->validate();
-                $file = $this->request->getFileMultiple('photo');
-                $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    $disasters->Icon = $photo->getFileUrl();
-                    $disasters->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mdisaster/add')->go();
-                } else {
-
-                    throw new EloquentException($photo->getErrorMessage(), $disasters, ResponseCode::INVALID_DATA);
-                }
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mdisaster/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_disaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasters = new M_disasters();
+        $disasters->parseFromRequest();
+        try {
+            $disasters->validate();
+            $file = $this->request->getFileMultiple('photo');
+            $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                $disasters->Icon = $photo->getFileUrl();
+                $disasters->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mdisaster/add')->go();
+            } else {
+
+                throw new EloquentException($photo->getErrorMessage(), $disasters, ResponseCode::INVALID_DATA);
+            }
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mdisaster/add")->with($e->getEntity())->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_disaster', 'Write')) {
-
-            $disasters = M_disasters::find($id);
-            $data['model'] = $disasters;
-            $this->loadView('m_disaster/edit', lang('Form.disaster'), $data);
-        } else {
-
-            return Redirect::redirect("Forbidden");
+        $res = $this->hasPermission('m_disaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasters = M_disasters::find($id);
+        $data['model'] = $disasters;
+        $this->loadView('m_disaster/edit', lang('Form.disaster'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_disaster', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasters = M_disasters::find($id);
-            $oldmodel = clone $disasters;
-
-            $disasters->parseFromRequest();
-
-            try {
-                $disasters->validate($oldmodel);
-                $file = $this->request->getFileMultiple('photo');
-                $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    if ($disasters->Icon)
-                        unlink(FCPATH  . $oldmodel->Icon);
-
-                    $disasters->Icon = $photo->getFileUrl();
-                    $disasters->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mdisaster')->go();
-                } else {
-                    throw new EloquentException($photo->getErrorMessage(), $disasters);
-                }
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mdisaster/edit/{$id}")->with($disasters)->go();
-            }
+        $res = $this->hasPermission('m_disaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $disasters = M_disasters::find($id);
+        $oldmodel = clone $disasters;
+
+        $disasters->parseFromRequest();
+
+        try {
+            $disasters->validate($oldmodel);
+            $file = $this->request->getFileMultiple('photo');
+            $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                if ($disasters->Icon)
+                    unlink(FCPATH  . $oldmodel->Icon);
+
+                $disasters->Icon = $photo->getFileUrl();
+                $disasters->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mdisaster')->go();
+            } else {
+                throw new EloquentException($photo->getErrorMessage(), $disasters);
+            }
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mdisaster/edit/{$id}")->with($disasters)->go();
+        }
+    
     }
 
 
@@ -117,7 +130,11 @@ class M_disaster extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_disaster', 'Delete')) {
+        $res = $this->hasPermission('m_disaster', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_disasters::find($id);
 
@@ -132,9 +149,7 @@ class M_disaster extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

@@ -19,78 +19,90 @@ class M_impact extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_impact', 'Read')) {
-
-            $this->loadView('m_impact/index', lang('Form.impact'));
+        $res = $this->hasPermission('m_impact', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_impact/index', lang('Form.impact'));
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_impact', 'Write')) {
-            $impacts = new M_impacts();
-            $data = setPageData_paging($impacts);
-            $this->loadView('m_impact/add', lang('Form.impact'), $data);
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $impacts = new M_impacts();
+        $data = setPageData_paging($impacts);
+        $this->loadView('m_impact/add', lang('Form.impact'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_impact', 'Write')) {
-
-            $impacts = new M_impacts();
-            $impacts->parseFromRequest();
-
-            try {
-                $impacts->validate();
-
-                $impacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mimpact/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mimpact/add")->with($impacts)->go();
-            }
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $impacts = new M_impacts();
+        $impacts->parseFromRequest();
+
+        try {
+            $impacts->validate();
+
+            $impacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mimpact/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mimpact/add")->with($impacts)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_impact', 'Write')) {
-
-            $impacts = M_impacts::find($id);
-
-            $data['model'] = $impacts;
-            $this->loadView('m_impact/edit', lang('Form.impact'), $data);
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $impacts = M_impacts::find($id);
+
+        $data['model'] = $impacts;
+        $this->loadView('m_impact/edit', lang('Form.impact'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('m_impact', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $impacts = M_impacts::find($id);
-            $oldmodel = clone $impacts;
-
-            $impacts->parseFromRequest();
-
-            try {
-                $impacts->validate($oldmodel);
-
-                $impacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mimpact')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->message));
-                return Redirect::redirect("mimpactedit/edit/{$id}")->with($impacts)->go();
-            }
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $impacts = M_impacts::find($id);
+        $oldmodel = clone $impacts;
+
+        $impacts->parseFromRequest();
+
+        try {
+            $impacts->validate($oldmodel);
+
+            $impacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mimpact')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->message));
+            return Redirect::redirect("mimpactedit/edit/{$id}")->with($impacts)->go();
+        }
+        
     }
 
 
@@ -98,8 +110,11 @@ class M_impact extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if (isPermitted_paging($_SESSION[get_variable() . 'userdata']['M_Groupuser_Id'], form_paging()['m_impact'], 'Delete')) {
+        $res = $this->hasPermission('m_impact', 'Delete');
 
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_impacts::find($id);
 
             $result = $model->delete();
@@ -112,9 +127,7 @@ class M_impact extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

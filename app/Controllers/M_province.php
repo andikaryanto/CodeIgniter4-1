@@ -22,76 +22,91 @@ class M_province extends Base_Controller
     public function index()
     {
 
-        if ($this->hasPermission('m_province', 'Read')) {
-            $this->loadView('m_province/index', lang('Form.province'));
+        $res = $this->hasPermission('m_province', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_province/index', lang('Form.province'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_province', 'Write')) {
-            $provinces = new M_provinces();
-            $data = setPageData_paging($provinces);
-            $this->loadView('m_province/add', lang('Form.province'), $data);
+        $res = $this->hasPermission('m_province', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $provinces = new M_provinces();
+        $data = setPageData_paging($provinces);
+        $this->loadView('m_province/add', lang('Form.province'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_province', 'Write')) {
-            $provinces = new M_provinces();
-            $provinces->parseFromRequest();
-            try {
-
-                $provinces->validate();
-               
-                $provinces->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mprovince/add')->go();
-                
-            } catch (EloquentException $e) { 
-                Session::setFlash('add_warning_msg', $e->getMessages());
-                return Redirect::redirect('mprovince/add')->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_province', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $provinces = new M_provinces();
+        $provinces->parseFromRequest();
+        try {
+
+            $provinces->validate();
+            
+            $provinces->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mprovince/add')->go();
+            
+        } catch (EloquentException $e) { 
+            Session::setFlash('add_warning_msg', $e->getMessages());
+            return Redirect::redirect('mprovince/add')->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_province', 'Write')) {
-
-            $provinces = M_provinces::find($id);
-            $data['model'] = $provinces;
-            $this->loadView('m_province/edit', lang('Form.province'), $data);
+        $res = $this->hasPermission('m_province', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $provinces = M_provinces::find($id);
+        $data['model'] = $provinces;
+        $this->loadView('m_province/edit', lang('Form.province'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_province', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $provinces = M_provinces::find($id);
-            $oldmodel = clone $provinces;
-
-            $provinces->parseFromRequest();
-
-            try {
-
-                $validate = $provinces->validate($oldmodel);
-
-                DbTrans::beginTransaction();
-                $provinces->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                DbTrans::commit();
-                return Redirect::redirect('mprovince')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', $e->getMessages());
-                return Redirect::redirect("mprovince/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_province', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $provinces = M_provinces::find($id);
+        $oldmodel = clone $provinces;
+
+        $provinces->parseFromRequest();
+
+        try {
+
+            $validate = $provinces->validate($oldmodel);
+
+            DbTrans::beginTransaction();
+            $provinces->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            DbTrans::commit();
+            return Redirect::redirect('mprovince')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', $e->getMessages());
+            return Redirect::redirect("mprovince/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -99,7 +114,11 @@ class M_province extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_province', 'Delete')) {
+        $res = $this->hasPermission('m_province', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_provinces::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -111,8 +130,6 @@ class M_province extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

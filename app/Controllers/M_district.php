@@ -19,76 +19,87 @@ class M_district extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_district', 'Read')) {
-            // $districts = new M_districts();
-
-            // $result = $districts->findAll();
-            // $data['model'] = $result;
-            $this->loadView('m_district/index', lang('Form.district'));
+        $res = $this->hasPermission('m_district', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_district/index', lang('Form.district'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_district', 'Write')) {
-            $districts = new M_districts();
-            $data = setPageData_paging($districts);
-            $this->loadView('m_district/add', lang('Form.district'), $data);
+        $res = $this->hasPermission('m_district', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $districts = new M_districts();
+        $data = setPageData_paging($districts);
+        $this->loadView('m_district/add', lang('Form.district'), $data);
+    
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('m_district', 'Write')) {
-
-            $districts = new M_districts();
-            $districts->parseFromRequest();
-
-            try {
-                $districts->validate();
-
-                $districts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mdistrict/add')->with($districts)->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mdistrict/add')->with($districts)->go();
-            }
+        $res = $this->hasPermission('m_district', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $districts = new M_districts();
+        $districts->parseFromRequest();
+
+        try {
+            $districts->validate();
+
+            $districts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mdistrict/add')->with($districts)->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mdistrict/add')->with($districts)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_district', 'Write')) {
-
-            $districts = M_districts::find($id);
-            $data['model'] = $districts;
-            $this->loadView('m_district/edit', lang('Form.district'), $data);
+        $res = $this->hasPermission('m_district', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $districts = M_districts::find($id);
+        $data['model'] = $districts;
+        $this->loadView('m_district/edit', lang('Form.district'), $data);
+    
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_district', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $districts = M_districts::find($id);
-            $oldmodel = clone $districts;
-
-            $districts->parseFromRequest();
-
-            try {
-                $districts->validate($oldmodel);
-                $districts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mdistrict')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mdistrict/edit/{$id}")->with($districts)->go();
-            }
+        $res = $this->hasPermission('m_district', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $districts = M_districts::find($id);
+        $oldmodel = clone $districts;
+
+        $districts->parseFromRequest();
+
+        try {
+            $districts->validate($oldmodel);
+            $districts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mdistrict')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mdistrict/edit/{$id}")->with($districts)->go();
+        }
+    
     }
 
 
@@ -96,7 +107,11 @@ class M_district extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_district', 'Delete')) {
+        $res = $this->hasPermission('m_district', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_districts::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -108,9 +123,7 @@ class M_district extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

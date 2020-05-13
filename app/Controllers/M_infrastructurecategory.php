@@ -21,88 +21,102 @@ class M_infrastructurecategory extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_infrastructurecategory', 'Read')) {
-            $this->loadView('m_infrastructurecategory/index', lang('Form.infrastructurecategory'));
+        $res = $this->hasPermission('m_infrastructurecategory', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_infrastructurecategory/index', lang('Form.infrastructurecategory'));
+     
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_infrastructurecategory', 'Write')) {
-            $infrastructurecategories = new M_infrastructurecategories();
-            $data = setPageData_paging($infrastructurecategories);
-            $this->loadView('m_infrastructurecategory/add', lang('Form.infrastructurecategory'), $data);
+        $res = $this->hasPermission('m_infrastructurecategory', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $infrastructurecategories = new M_infrastructurecategories();
+        $data = setPageData_paging($infrastructurecategories);
+        $this->loadView('m_infrastructurecategory/add', lang('Form.infrastructurecategory'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_infrastructurecategory', 'Write')) {
-
-            $infrastructurecategories = new M_infrastructurecategories();
-            $infrastructurecategories->parseFromRequest();
-
-            try {
-                $infrastructurecategories->validate();
-                $file = $this->request->getFileMultiple('photo');
-                $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    $infrastructurecategories->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('minfrastructurecategory/add')->go();
-                } else {
-                    throw new EloquentException($result->getErrorMessage(), $infrastructurecategories);
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("minfrastructurecategory/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_infrastructurecategory', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $infrastructurecategories = new M_infrastructurecategories();
+        $infrastructurecategories->parseFromRequest();
+
+        try {
+            $infrastructurecategories->validate();
+            $file = $this->request->getFileMultiple('photo');
+            $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                $infrastructurecategories->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('minfrastructurecategory/add')->go();
+            } else {
+                throw new EloquentException($result->getErrorMessage(), $infrastructurecategories);
+            }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("minfrastructurecategory/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_infrastructurecategory', 'Write')) {
-            $infrastructurecategories = M_infrastructurecategories::find($id);
-            $data['model'] = $infrastructurecategories;
-            $this->loadView('m_infrastructurecategory/edit', lang('Form.infrastructurecategory'), $data);
+        $res = $this->hasPermission('m_infrastructurecategory', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $infrastructurecategories = M_infrastructurecategories::find($id);
+        $data['model'] = $infrastructurecategories;
+        $this->loadView('m_infrastructurecategory/edit', lang('Form.infrastructurecategory'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_infrastructurecategory', 'Write')) {
-            $id = $this->request->getPost('Id');
+        $res = $this->hasPermission('m_infrastructurecategory', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $id = $this->request->getPost('Id');
 
-            $infrastructurecategories = M_infrastructurecategories::find($id);
-            $oldmodel = clone $infrastructurecategories;
+        $infrastructurecategories = M_infrastructurecategories::find($id);
+        $oldmodel = clone $infrastructurecategories;
 
-            $infrastructurecategories->parseFromRequest();
+        $infrastructurecategories->parseFromRequest();
 
-            try {
-                $infrastructurecategories->validate($oldmodel);
-                $file = $this->request->getFileMultiple('photo');
-                $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    if ($infrastructurecategories->Icon)
-                        unlink(FCPATH  . $oldmodel->Icon);
-                    $infrastructurecategories->Icon = $photo->getFileUrl();
-                    $infrastructurecategories->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('minfrastructurecategory')->go();
-                } else {
-                    throw new EloquentException($photo->getErrorMessage(), $infrastructurecategories);
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("minfrastructurecategory/edit/{$id}")->with($e->getEntity())->go();
+        try {
+            $infrastructurecategories->validate($oldmodel);
+            $file = $this->request->getFileMultiple('photo');
+            $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                if ($infrastructurecategories->Icon)
+                    unlink(FCPATH  . $oldmodel->Icon);
+                $infrastructurecategories->Icon = $photo->getFileUrl();
+                $infrastructurecategories->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('minfrastructurecategory')->go();
+            } else {
+                throw new EloquentException($photo->getErrorMessage(), $infrastructurecategories);
             }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("minfrastructurecategory/edit/{$id}")->with($e->getEntity())->go();
         }
     }
 
@@ -111,7 +125,11 @@ class M_infrastructurecategory extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_infrastructurecategory', 'Delete')) {
+        $res = $this->hasPermission('m_infrastructurecategory', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_infrastructurecategories::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -123,8 +141,6 @@ class M_infrastructurecategory extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

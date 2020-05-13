@@ -20,77 +20,86 @@ class M_village extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_village', 'Read')) {
-            // $villages = new M_villages();
-
-            // $result = $villages->findAll();
-            // $data['model'] = $result;
-            $this->loadView('m_village/index', lang('Form.village'));
+        $res = $this->hasPermission('m_village', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_village/index', lang('Form.village'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_village', 'Write')) {
-            $villages = new M_villages();
-            $data = setPageData_paging($villages);
-            $this->loadView('m_village/add', lang('Form.village'), $data);
+        $res = $this->hasPermission('m_village', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $villages = new M_villages();
+        $data = setPageData_paging($villages);
+        $this->loadView('m_village/add', lang('Form.village'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_village', 'Write')) {
+        $res = $this->hasPermission('m_village', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $villages = new M_villages();
+        $villages->parseFromRequest();
 
-            $villages = new M_villages();
-            $villages->parseFromRequest();
+        try {
+            $villages->validate();
+            $villages->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mvillage/add')->with($villages)->go();
+        } catch (EloquentException $e) {
 
-            try {
-                $villages->validate();
-                $villages->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mvillage/add')->with($villages)->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mvillage/add")->with($e->getEntity())->go();
-            }
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mvillage/add")->with($e->getEntity())->go();
+        
         }
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_village', 'Write')) {
-
-            $villages = M_villages::find($id);
-            $data['model'] = $villages;
-            $this->loadView('m_village/edit', lang('Form.village'), $data);
+        $res = $this->hasPermission('m_village', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $villages = M_villages::find($id);
+        $data['model'] = $villages;
+        $this->loadView('m_village/edit', lang('Form.village'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_village', 'Write')) {
-            $id = $this->request->getPost('Id');
+        $res = $this->hasPermission('m_village', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $id = $this->request->getPost('Id');
 
 
-            $villages = M_villages::find($id);
-            $oldmodel = clone $villages;
+        $villages = M_villages::find($id);
+        $oldmodel = clone $villages;
 
-            $villages->parseFromRequest();
+        $villages->parseFromRequest();
 
-            try {
-                $villages->validate($oldmodel);
-                $villages->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mvillage')->go();
-            } catch (EloquentException $e) {
+        try {
+            $villages->validate($oldmodel);
+            $villages->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mvillage')->go();
+        } catch (EloquentException $e) {
 
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mvillage/edit/{$id}")->with($e->getEntity())->go();
-            }
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mvillage/edit/{$id}")->with($e->getEntity())->go();
         }
     }
 
@@ -99,7 +108,11 @@ class M_village extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_village', 'Delete')) {
+        $res = $this->hasPermission('m_village', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_villages::find($id);
             $result = $model->delete();
@@ -112,8 +125,6 @@ class M_village extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

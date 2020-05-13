@@ -24,126 +24,139 @@ class M_infrastructure extends Base_Controller
     public function index()
     {
         
-        if ($this->hasPermission('m_infrastructure', 'Read')) {
-
-            $disaster = $this->request->getGet("Category");
-
-            $params = [
-                'join' => [
-                    'm_infrastructurecategories' => [
-                        [
-                            'key' => 'm_infrastructures.M_Infrastructurecategory_Id = m_infrastructurecategories.Id',
-                            'type' => 'left'
-                        ]
-                    ]
-                ],
-                'whereIn' => [
-                    "m_infrastructurecategories.Id" => $disaster
-                ]
-            ];
-            $infra = M_infrastructures::findAll($params);
-
-            $data['input'] = [
-                "Category" => $disaster ? "[" . implode(",", $disaster) . "]" : array()
-            ];
-            $data['model'] = $infra;
-            $this->loadView('m_infrastructure/index', lang('Form.infrastructure'),  $data);
+        $res = $this->hasPermission('m_infrastructure', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disaster = $this->request->getGet("Category");
+
+        $params = [
+            'join' => [
+                'm_infrastructurecategories' => [
+                    [
+                        'key' => 'm_infrastructures.M_Infrastructurecategory_Id = m_infrastructurecategories.Id',
+                        'type' => 'left'
+                    ]
+                ]
+            ],
+            'whereIn' => [
+                "m_infrastructurecategories.Id" => $disaster
+            ]
+        ];
+        $infra = M_infrastructures::findAll($params);
+
+        $data['input'] = [
+            "Category" => $disaster ? "[" . implode(",", $disaster) . "]" : array()
+        ];
+        $data['model'] = $infra;
+        $this->loadView('m_infrastructure/index', lang('Form.infrastructure'),  $data);
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_infrastructure', 'Write')) {
-            $infrastructures = new M_infrastructures();
-            $data = setPageData_paging($infrastructures);
-            $this->loadView('m_infrastructure/add', lang('Form.infrastructure'), $data);
+        $res = $this->hasPermission('m_infrastructure', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $infrastructures = new M_infrastructures();
+        $data = setPageData_paging($infrastructures);
+        $this->loadView('m_infrastructure/add', lang('Form.infrastructure'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_infrastructure', 'Write')) {
-            // echo json_encode($this->request->request());
-
-            $infrastructures = new M_infrastructures();
-            $infrastructures->parseFromRequest();
-            $infrastructures->IsActive = 1;
-
-            try {
-                $infrastructures->validate();
-
-                $file = $this->request->getFiles('photo');
-                $fileCls = new File("assets/upload/infrastructure", ["jpg", "jpeg"]);
-                if ($fileCls->upload($file)) {
-                    $infrastructures->PhotoUrl = $fileCls->getFileUrl();
-                    $infrastructures->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('minfrastructure/add')->go();
-                    // echo json_encode($infrastructures);
-                } else {
-
-                    throw new EloquentException($fileCls->getErrorMessage(), $infrastructures);
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("minfrastructure/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_infrastructure', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $infrastructures = new M_infrastructures();
+        $infrastructures->parseFromRequest();
+        $infrastructures->IsActive = 1;
+
+        try {
+            $infrastructures->validate();
+
+            $file = $this->request->getFiles('photo');
+            $fileCls = new File("assets/upload/infrastructure", ["jpg", "jpeg"]);
+            if ($fileCls->upload($file)) {
+                $infrastructures->PhotoUrl = $fileCls->getFileUrl();
+                $infrastructures->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('minfrastructure/add')->go();
+                // echo json_encode($infrastructures);
+            } else {
+
+                throw new EloquentException($fileCls->getErrorMessage(), $infrastructures);
+            }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("minfrastructure/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_infrastructure', 'Write')) {
-            $infrastructures = M_infrastructures::find($id);
-            $data['model'] = $infrastructures;
-            $this->loadView('m_infrastructure/edit', lang('Form.infrastructure'), $data);
+        $res = $this->hasPermission('m_infrastructure', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $infrastructures = M_infrastructures::find($id);
+        $data['model'] = $infrastructures;
+        $this->loadView('m_infrastructure/edit', lang('Form.infrastructure'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_infrastructure', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $infrastructures = M_infrastructures::find($id);
-            $oldmodel = clone $infrastructures;
-
-            $infrastructures->parseFromRequest();
-
-            $validate = $infrastructures->validate($oldmodel);
-            if ($validate) {
-
-                Session::setFlash('edit_warning_msg', $validate);
-                return Redirect::redirect("minfrastructure/edit/{$id}")->with($infrastructures)->go();
-            } else {
-
-                $file = $this->request->getFiles('photo');
-                // echo json_encode($file);
-                if ($file['name']) {
-                    // echo json_encode($this->request->getFiles('photo'));
-                    $fileCls = new File("assets/upload/infrastructure", ["jpg", "jpeg"]);
-                    if ($fileCls->upload($file)) {
-
-                        unlink(FCPATH  . $oldmodel->PhotoUrl);
-                        $infrastructures->PhotoUrl = $fileCls->getFileUrl();
-                        $infrastructures->save();
-                        Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                        return Redirect::redirect('minfrastructure')->go();
-                    } else {
-
-                        Session::setFlash('edit_warning_msg', array(0 => $fileCls->getErrorMessage()));
-                        return Redirect::redirect("minfrastructure/edit/{$id}")->with($infrastructures)->go();
-                    }
-                } else {
-                    $infrastructures->save();
-                }
-            }
-
-            return Redirect::redirect('minfrastructure')->go();
+        $res = $this->hasPermission('m_infrastructure', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $infrastructures = M_infrastructures::find($id);
+        $oldmodel = clone $infrastructures;
+
+        $infrastructures->parseFromRequest();
+
+        $validate = $infrastructures->validate($oldmodel);
+        if ($validate) {
+
+            Session::setFlash('edit_warning_msg', $validate);
+            return Redirect::redirect("minfrastructure/edit/{$id}")->with($infrastructures)->go();
+        } else {
+
+            $file = $this->request->getFiles('photo');
+            // echo json_encode($file);
+            if ($file['name']) {
+                // echo json_encode($this->request->getFiles('photo'));
+                $fileCls = new File("assets/upload/infrastructure", ["jpg", "jpeg"]);
+                if ($fileCls->upload($file)) {
+
+                    unlink(FCPATH  . $oldmodel->PhotoUrl);
+                    $infrastructures->PhotoUrl = $fileCls->getFileUrl();
+                    $infrastructures->save();
+                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                    return Redirect::redirect('minfrastructure')->go();
+                } else {
+
+                    Session::setFlash('edit_warning_msg', array(0 => $fileCls->getErrorMessage()));
+                    return Redirect::redirect("minfrastructure/edit/{$id}")->with($infrastructures)->go();
+                }
+            } else {
+                $infrastructures->save();
+            }
+        }
+
+        return Redirect::redirect('minfrastructure')->go();
+        
     }
 
 
@@ -151,7 +164,11 @@ class M_infrastructure extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_infrastructure', 'Delete')) {
+        $res = $this->hasPermission('m_infrastructure', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_infrastructures::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -163,8 +180,6 @@ class M_infrastructure extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

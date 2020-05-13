@@ -20,78 +20,94 @@ class M_volunteer extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_volunteer', 'Read')) {
-
-            $this->loadView('m_volunteer/index', lang('Form.volunteer'));
+        $res = $this->hasPermission('m_volunteer', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_volunteer/index', lang('Form.volunteer'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_volunteer', 'Write')) {
-            $volunteers = new M_volunteers();
-            $volunteers->BirthDate = get_formated_date(null, "d-m-Y");
-            $data = setPageData_paging($volunteers);
-            $this->loadView('m_volunteer/add', lang('Form.volunteer'), $data);
+        $res = $this->hasPermission('m_volunteer', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $volunteers = new M_volunteers();
+        $volunteers->BirthDate = get_formated_date(null, "d-m-Y");
+        $data = setPageData_paging($volunteers);
+        $this->loadView('m_volunteer/add', lang('Form.volunteer'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_volunteer', 'Write')) {
-
-            $volunteers = new M_volunteers();
-            $volunteers->parseFromRequest();
-            try {
-                $volunteers->validate();
-
-
-                $volunteers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mvolunteer/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mvolunteer/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_volunteer', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $volunteers = new M_volunteers();
+        $volunteers->parseFromRequest();
+        try {
+            $volunteers->validate();
+
+
+            $volunteers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mvolunteer/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mvolunteer/add")->with($e->getEntity())->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_volunteer', 'Write')) {
-
-            $volunteers = M_volunteers::find($id);
-            $volunteers->BirthDate = get_formated_date($volunteers->BirthDate, "d-m-Y");
-            $data['model'] = $volunteers;
-            $this->loadView('m_volunteer/edit', lang('Form.volunteer'), $data);
+        $res = $this->hasPermission('m_volunteer', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $volunteers = M_volunteers::find($id);
+        $volunteers->BirthDate = get_formated_date($volunteers->BirthDate, "d-m-Y");
+        $data['model'] = $volunteers;
+        $this->loadView('m_volunteer/edit', lang('Form.volunteer'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_volunteer', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $volunteers = M_volunteers::find($id);
-            $oldmodel = clone $volunteers;
-
-            $volunteers->parseFromRequest();
-
-            try{
-                $volunteers->validate($oldmodel);
-                $volunteers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mvolunteer')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mvolunteer/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_volunteer', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $volunteers = M_volunteers::find($id);
+        $oldmodel = clone $volunteers;
+
+        $volunteers->parseFromRequest();
+
+        try{
+            $volunteers->validate($oldmodel);
+            $volunteers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mvolunteer')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mvolunteer/edit/{$id}")->with($e->getEntity())->go();
+        }
+    
     }
 
 
@@ -99,7 +115,11 @@ class M_volunteer extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_volunteer', 'Delete')) {
+        $res = $this->hasPermission('m_capability', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_volunteers::find($id);
 

@@ -22,99 +22,113 @@ class M_villagedisaster extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_villagedisaster', 'Read')) {
-
-            $this->loadView('m_villagedisaster/index', lang('Form.villageresistdisaster'));
+        $res = $this->hasPermission('m_villagedisaster', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_villagedisaster/index', lang('Form.villageresistdisaster'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_villagedisaster', 'Write')) {
-            $villagedisasters = new M_villagedisasters();
-            $data = setPageData_paging($villagedisasters);
-            $this->loadView('m_villagedisaster/add', lang('Form.villageresistdisaster'), $data);
+        $res = $this->hasPermission('m_villagedisaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $villagedisasters = new M_villagedisasters();
+        $data = setPageData_paging($villagedisasters);
+        $this->loadView('m_villagedisaster/add', lang('Form.villageresistdisaster'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_villagedisaster', 'Write')) {
+        $res = $this->hasPermission('m_villagedisaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-            $villagedisasters = new M_villagedisasters();
-            $villagedisasters->parseFromRequest();
-            $villagedisasters->IsActive = 1;
+        $villagedisasters = new M_villagedisasters();
+        $villagedisasters->parseFromRequest();
+        $villagedisasters->IsActive = 1;
 
-            try {
-                $villagedisasters->validate();
-                $file = $this->request->getFiles('photo');
-                $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
-                if ($fileCls->upload($file)) {
-                    $villagedisasters->PhotoUrl = $fileCls->getFileUrl();
-                    $villagedisasters->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mvillagedisaster/add')->go();
-                    // echo json_encode($villagedisasters);
-                } else {
+        try {
+            $villagedisasters->validate();
+            $file = $this->request->getFiles('photo');
+            $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
+            if ($fileCls->upload($file)) {
+                $villagedisasters->PhotoUrl = $fileCls->getFileUrl();
+                $villagedisasters->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mvillagedisaster/add')->go();
+                // echo json_encode($villagedisasters);
+            } else {
 
-                    throw new EloquentException($fileCls->getErrorMessage(), $villagedisasters);
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mvillagedisaster/add")->with($e->getEntity())->go();
+                throw new EloquentException($fileCls->getErrorMessage(), $villagedisasters);
             }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mvillagedisaster/add")->with($e->getEntity())->go();
         }
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_villagedisaster', 'Write')) {
-
-            $villagedisasters = M_villagedisasters::find($id);
-            $data['model'] = $villagedisasters;
-            $this->loadView('m_villagedisaster/edit', lang('Form.villageresistdisaster'), $data);
+        $res = $this->hasPermission('m_villagedisaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $villagedisasters = M_villagedisasters::find($id);
+        $data['model'] = $villagedisasters;
+        $this->loadView('m_villagedisaster/edit', lang('Form.villageresistdisaster'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_villagedisaster', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-
-            $villagedisasters = M_villagedisasters::find($id);
-            $oldmodel = clone $villagedisasters;
-
-            $villagedisasters->parseFromRequest();
-
-            try {
-                $villagedisasters->validate($oldmodel);
-                $file = $this->request->getFiles('photo');
-                if ($file['name']) {
-                    $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
-                    if ($fileCls->upload($file)) {
-
-                        unlink(APPPATH . $oldmodel->PhotoUrl);
-                        $villagedisasters->PhotoUrl = $fileCls->getFileUrl();
-                        $villagedisasters->save();
-                        Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                        return Redirect::redirect('mvillagedisaster');
-                    } else {
-                        throw new EloquentException($fileCls->getErrorMessage(), $villagedisasters);
-                    }
-                } else {
-                    $villagedisasters->save();
-                    return Redirect::redirect('mvillagedisaster');
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("m_villagedisaster/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_villagedisaster', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+
+        $villagedisasters = M_villagedisasters::find($id);
+        $oldmodel = clone $villagedisasters;
+
+        $villagedisasters->parseFromRequest();
+
+        try {
+            $villagedisasters->validate($oldmodel);
+            $file = $this->request->getFiles('photo');
+            if ($file['name']) {
+                $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
+                if ($fileCls->upload($file)) {
+
+                    unlink(APPPATH . $oldmodel->PhotoUrl);
+                    $villagedisasters->PhotoUrl = $fileCls->getFileUrl();
+                    $villagedisasters->save();
+                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                    return Redirect::redirect('mvillagedisaster');
+                } else {
+                    throw new EloquentException($fileCls->getErrorMessage(), $villagedisasters);
+                }
+            } else {
+                $villagedisasters->save();
+                return Redirect::redirect('mvillagedisaster');
+            }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("m_villagedisaster/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -122,7 +136,11 @@ class M_villagedisaster extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_villagedisaster', 'Delete')) {
+        $res = $this->hasPermission('m_villagedisaster', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_villagedisasters::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -134,8 +152,6 @@ class M_villagedisaster extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

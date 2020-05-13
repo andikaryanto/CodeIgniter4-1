@@ -1,7 +1,7 @@
 <?php  
 namespace App\Eloquents;
 
-use App\Classes\Exception\EntityException;
+use App\Classes\Exception\EloquentException;
 use App\Libraries\ResponseCode;
 use App\Eloquents\BaseEloquent;
 
@@ -54,19 +54,19 @@ class M_villages extends BaseEloquent {
                 $nameexist = $this->isDataExist($params);
             }
             else{
-                throw new EntityException(lang('Error.name_can_not_null'), $this, ResponseCode::INVALID_DATA);
+                throw new EloquentException(lang('Error.name_can_not_null'), $this, ResponseCode::INVALID_DATA);
             }
         }
         if($nameexist)
         {
-            throw new EntityException(lang('Error.name_exist'), $this, ResponseCode::DATA_EXIST);
+            throw new EloquentException(lang('Error.name_exist'), $this, ResponseCode::DATA_EXIST);
         }
         
     }
     
     public function calculatedFamilyCard(){
 
-        $result = $this->db->query("
+        $result = $this->dbs->query("
             SELECT a.`M_Village_Id` ,RW, COUNT(RW) KK
             FROM m_familycards a
             INNER JOIN `m_familycardmembers` c ON c.`M_Familycard_Id` = a.Id

@@ -19,7 +19,7 @@ $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
-$routes->set404Override();
+$routes->set404Override("App\Controllers\Error::pagenotfound");
 $routes->setAutoRoute(true);
 
 /**
@@ -66,7 +66,7 @@ $routes->post($parent.'/addsave', 'M_groupuser::addsave');
 $routes->get($parent.'/edit/(:num)', 'M_groupuser::edit/$1');
 $routes->post($parent.'/editsave', 'M_groupuser::editsave');
 $routes->post($parent.'/delete', 'M_groupuser::delete');
-$routes->get($parent.'/editrole/(:num)', 'M_groupuser::editrole');
+$routes->get($parent.'/editrole/(:num)', 'M_groupuser::editrole/$1');
 $routes->post($parent.'/saverole', 'M_groupuser::saverole');
 $routes->post($parent.'/savereportrole', 'M_groupuser::savereportrole');
 $routes->get($parent.'/editreportrole/(:num)', 'M_groupuser::editreportrole');

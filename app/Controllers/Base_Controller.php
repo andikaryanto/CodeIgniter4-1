@@ -31,7 +31,7 @@ class Base_Controller extends Controller
 	 *
 	 * @var array
 	 */
-    protected $helpers = [];
+    protected $helpers = ['date','helper','paging','config','inflector','url', 'html', 'appurl', 'appform'];
     
     public $db;
     public $request;
@@ -49,7 +49,6 @@ class Base_Controller extends Controller
 		//--------------------------------------------------------------------
 		// E.g.:
 		// $this->session = \Config\Services::session();
-        helper(['date','helper','paging','config','inflector','url', 'html', 'appurl', 'appform']);
         $this->db = \Config\Database::connect();
         $this->request = $request;
         
@@ -217,12 +216,12 @@ class Base_Controller extends Controller
             $data = $datas;
 		}
 
-        $this->view('shared/header', $menudata, false);
-        $this->view($url, $data, false);
-        $this->view('shared/footer', array());
+        $this->view('shared/header', $menudata);
+        $this->view($url, $data);
+        $this->view('shared/footer', array(), true);
     }
 
-    public function view($url, $data, $clearData = true){
+    public function view($url, $data = [], $clearData = false){
         if($clearData){
             Session::remove('data');
         }
@@ -231,6 +230,18 @@ class Base_Controller extends Controller
 
 	public function hasPermission($form, $role)
     {
+        if($this->request->isAJAX()){
+            if (empty(Services::session()->get(get_variable() . 'userdata'))) {
+                echo json_encode(deleteStatus("Sessi Habis", false));
+                die();
+            }
+
+            if (isPermitted_paging($_SESSION[get_variable() . 'userdata']['M_Groupuser_Id'], form_paging()[$form], $role)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 		
         if (empty(Services::session()->get(get_variable() . 'userdata'))) {
             return Redirect::redirect('welcome')->go();

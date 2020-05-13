@@ -21,92 +21,102 @@ class M_familycardmember extends Base_Controller
 
     public function index($idfamilycard)
     {
-        if ($this->hasPermission('m_familycard', 'Read')) {
-
-            $result = M_familycards::find($idfamilycard);
-            $data['model'] = $result;
-
-            $this->loadView('m_familycardmember/index', lang('Form.familycardmember'), $data);
+        $res = $this->hasPermission('m_familycard', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = M_familycards::find($idfamilycard);
+        $data['model'] = $result;
+
+        $this->loadView('m_familycardmember/index', lang('Form.familycardmember'), $data);
+        
     }
 
     public function add($idfamilycard)
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $result = M_familycards::find($idfamilycard);
-
-            $familycardmembers = new M_familycardmembers();
-
-            $data = setPageData_paging($familycardmembers);
-
-            $data['familycard'] = $result;
-            $this->loadView('m_familycardmember/add', lang('Form.familycardmember'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = M_familycards::find($idfamilycard);
+
+        $familycardmembers = new M_familycardmembers();
+
+        $data = setPageData_paging($familycardmembers);
+
+        $data['familycard'] = $result;
+        $this->loadView('m_familycardmember/add', lang('Form.familycardmember'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-
-            $familycardmembers = new M_familycardmembers();
-            $familycardmembers->parseFromRequest();
-
-            try {
-                $familycardmembers->validate();
-
-                $familycardmembers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->with($familycardmembers)->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $familycardmembers = new M_familycardmembers();
+        $familycardmembers->parseFromRequest();
+
+        try {
+            $familycardmembers->validate();
+
+            $familycardmembers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mfamilycardmember/add/{$familycardmembers->M_Familycard_Id}")->with($familycardmembers)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-
-            $familycardmembers = M_familycardmembers::find($id);
-
-            $familycards = new M_familycards();
-            $result = M_familycards::find($familycardmembers->M_Familycard_Id);
-
-            $data['model'] = $familycardmembers;
-            $data['familycard'] = $result;
-            $this->loadView('m_familycardmember/edit', lang('Form.familycardmember'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $familycardmembers = M_familycardmembers::find($id);
+
+        $familycards = new M_familycards();
+        $result = M_familycards::find($familycardmembers->M_Familycard_Id);
+
+        $data['model'] = $familycardmembers;
+        $data['familycard'] = $result;
+        $this->loadView('m_familycardmember/edit', lang('Form.familycardmember'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $familycardmembers = M_familycardmembers::find($id);
-            $oldmodel = clone $familycardmembers;
-
-            $familycardmembers->parseFromRequest();
-
-            try {
-                $familycardmembers->validate($oldmodel);
-                $familycardmembers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mfamilycardmember/$familycardmembers->M_Familycard_Id")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mfamilycardmember/edit/$id")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $familycardmembers = M_familycardmembers::find($id);
+        $oldmodel = clone $familycardmembers;
+
+        $familycardmembers->parseFromRequest();
+
+        try {
+            $familycardmembers->validate($oldmodel);
+            $familycardmembers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mfamilycardmember/$familycardmembers->M_Familycard_Id")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mfamilycardmember/edit/$id")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -114,8 +124,11 @@ class M_familycardmember extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_familycard', 'Delete')) {
+        $res = $this->hasPermission('m_familycard', 'Delete');
 
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_familycardmembers::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -127,9 +140,7 @@ class M_familycardmember extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData($idfamilycard)

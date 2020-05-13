@@ -20,78 +20,89 @@ class M_subdistrict extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_subdistrict', 'Read')) {
-            // $subdistricts = new M_subdistricts();
-
-            // $result = $subdistricts->findAll();
-            // $data['model'] = $result;
-            $this->loadView('m_subdistrict/index', lang('Form.subdistrict'));
+        $res = $this->hasPermission('m_subdistrict', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_subdistrict/index', lang('Form.subdistrict'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_subdistrict', 'Write')) {
-            $subdistricts = new M_subdistricts();
-            $data = setPageData_paging($subdistricts);
-            $this->loadView('m_subdistrict/add', lang('Form.subdistrict'), $data);
+        $res = $this->hasPermission('m_subdistrict', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $subdistricts = new M_subdistricts();
+        $data = setPageData_paging($subdistricts);
+        $this->loadView('m_subdistrict/add', lang('Form.subdistrict'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_subdistrict', 'Write')) {
-            $subdistricts = new M_subdistricts();
-            $subdistricts->parseFromRequest();
-
-            try {
-                $subdistricts->validate();
-
-                $subdistricts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('msubdistrict/add')->with($subdistricts)->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("msubdistrict/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_subdistrict', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $subdistricts = new M_subdistricts();
+        $subdistricts->parseFromRequest();
+
+        try {
+            $subdistricts->validate();
+
+            $subdistricts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('msubdistrict/add')->with($subdistricts)->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("msubdistrict/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_subdistrict', 'Write')) {
-
-            $subdistricts = M_subdistricts::find($id);
-            $data['model'] = $subdistricts;
-            $this->loadView('m_subdistrict/edit', lang('Form.subdistrict'), $data);
+        
+        $res = $this->hasPermission('m_subdistrict', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $subdistricts = M_subdistricts::find($id);
+        $data['model'] = $subdistricts;
+        $this->loadView('m_subdistrict/edit', lang('Form.subdistrict'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('m_subdistrict', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $subdistricts = M_subdistricts::find($id);
-            $oldmodel = clone $subdistricts;
-
-            $subdistricts->parseFromRequest();
-
-            try {
-                $subdistricts->validate($oldmodel);
-
-                $subdistricts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('msubdistrict')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("msubdistrict/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_subdistrict', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $subdistricts = M_subdistricts::find($id);
+        $oldmodel = clone $subdistricts;
+
+        $subdistricts->parseFromRequest();
+
+        try {
+            $subdistricts->validate($oldmodel);
+
+            $subdistricts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('msubdistrict')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("msubdistrict/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -99,7 +110,11 @@ class M_subdistrict extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_subdistrict', 'Delete')) {
+        $res = $this->hasPermission('m_subdistrict', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_subdistricts::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -111,8 +126,6 @@ class M_subdistrict extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

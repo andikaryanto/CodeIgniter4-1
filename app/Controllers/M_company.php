@@ -20,99 +20,112 @@ class M_company extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_company', 'Read')) {
-
-            $this->loadView('m_company/index', lang('Form.company'));
+        $res = $this->hasPermission('m_company', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_company/index', lang('Form.company'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_company', 'Write')) {
-            $companies = M_companies::findOne();
-            if ($companies == null)
-                $companies = new M_companies();
-            $data = setPageData_paging($companies);
-            // echo json_encode($data);
-            $this->loadView('m_company/add', lang('Form.company'), $data);
+        $res = $this->hasPermission('m_company', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $companies = M_companies::findOne();
+        if ($companies == null)
+            $companies = new M_companies();
+        $data = setPageData_paging($companies);
+        // echo json_encode($data);
+        $this->loadView('m_company/add', lang('Form.company'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('m_company', 'Write')) {
-
-            $companies = new M_companies();
-            $companies->parseFromRequest();
-            try {
-                // echo json_encode($companies);
-                $companies->validate();
-                $companies->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mcompany')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                // echo json_encode($e);
-                return Redirect::redirect("mcompany")->go();
-            }
+        $res = $this->hasPermission('m_company', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $companies = new M_companies();
+        $companies->parseFromRequest();
+        try {
+            // echo json_encode($companies);
+            $companies->validate();
+            $companies->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mcompany')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            // echo json_encode($e);
+            return Redirect::redirect("mcompany")->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_company', 'Write')) {
-
-            $companies = M_companies::find($id);
-            $data['model'] = $companies;
-            $this->loadView('m_company/edit', lang('Form.company'), $data);
-        } else {
-
-            return Redirect::redirect("Forbidden");
+        $res = $this->hasPermission('m_company', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $companies = M_companies::find($id);
+        $data['model'] = $companies;
+        $this->loadView('m_company/edit', lang('Form.company'), $data);
+       
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('m_company', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $companies = M_companies::find($id);
-            $oldmodel = clone $companies;
-
-            $companies->parseFromRequest();
-
-            try {
-                $companies->validate($oldmodel);
-                $file = $this->request->getFileMultiple('photo');
-                $photo = new File("assets/upload/company/icon", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    if ($companies->Icon)
-                        unlink(FCPATH  . $oldmodel->Icon);
-
-                    $companies->Icon = $photo->getFileUrl();
-                    $companies->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mcompany')->go();
-                } else {
-                    throw new EloquentException($photo->getErrorMessage(), $companies);
-                }
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mcompany/edit/{$id}")->with($companies)->go();
-            }
+        $res = $this->hasPermission('m_company', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $companies = M_companies::find($id);
+        $oldmodel = clone $companies;
+
+        $companies->parseFromRequest();
+
+        try {
+            $companies->validate($oldmodel);
+            $file = $this->request->getFileMultiple('photo');
+            $photo = new File("assets/upload/company/icon", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                if ($companies->Icon)
+                    unlink(FCPATH  . $oldmodel->Icon);
+
+                $companies->Icon = $photo->getFileUrl();
+                $companies->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mcompany')->go();
+            } else {
+                throw new EloquentException($photo->getErrorMessage(), $companies);
+            }
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mcompany/edit/{$id}")->with($companies)->go();
+        }
+    
     }
 
 
     public function delete()
     {
-
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_company', 'Delete')) {
+        $res = $this->hasPermission('m_company', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_companies::find($id);
 
@@ -127,8 +140,6 @@ class M_company extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

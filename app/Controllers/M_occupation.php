@@ -20,75 +20,90 @@ class M_occupation extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_occupation', 'Read')) {
-            $this->loadView('m_occupation/index', lang('Form.occupation'));
+        $res = $this->hasPermission('m_occupation', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_occupation/index', lang('Form.occupation'));
+    
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_occupation', 'Write')) {
-            $occupations = new M_occupations();
-            $data = setPageData_paging($occupations);
-            $this->loadView('m_occupation/add', lang('Form.occupation'), $data);
+        $res = $this->hasPermission('m_occupation', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $occupations = new M_occupations();
+        $data = setPageData_paging($occupations);
+        $this->loadView('m_occupation/add', lang('Form.occupation'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_occupation', 'Write')) {
-            $occupations = new M_occupations();
-            $occupations->parseFromRequest();
-
-            try {
-                $occupations->validate();
-
-                $occupations->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('moccupation/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("moccupation/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_occupation', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $occupations = new M_occupations();
+        $occupations->parseFromRequest();
+
+        try {
+            $occupations->validate();
+
+            $occupations->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('moccupation/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("moccupation/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_occupation', 'Write')) {
-
-            $occupations = M_occupations::find($id);
-            $data['model'] = $occupations;
-            $this->loadView('m_occupation/edit', lang('Form.occupation'), $data);
+        $res = $this->hasPermission('m_occupation', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $occupations = M_occupations::find($id);
+        $data['model'] = $occupations;
+        $this->loadView('m_occupation/edit', lang('Form.occupation'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_occupation', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-
-            $occupations = M_occupations::find($id);
-            $oldmodel = clone $occupations;
-
-            $occupations->parseFromRequest();
-
-            try {
-                $occupations->validate($oldmodel);
-
-                $occupations->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('moccupation')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("moccupation/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_occupation', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+
+        $occupations = M_occupations::find($id);
+        $oldmodel = clone $occupations;
+
+        $occupations->parseFromRequest();
+
+        try {
+            $occupations->validate($oldmodel);
+
+            $occupations->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('moccupation')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("moccupation/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -96,7 +111,11 @@ class M_occupation extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_occupation', 'Delete')) {
+        $res = $this->hasPermission('m_occupation', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_occupations::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -108,8 +127,6 @@ class M_occupation extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

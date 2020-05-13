@@ -22,111 +22,120 @@ class M_disasterschool extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_disasterschool', 'Read')) {
-            // $disasterschools = new M_disasterschools();
-
-            // $result = $disasterschools->findAll();
-            // $data['model'] = $result;
-            $this->loadView('m_disasterschool/index', lang('Form.villageresistdisaster'));
+        $res = $this->hasPermission('m_disasterschool', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_disasterschool/index', lang('Form.villageresistdisaster'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_disasterschool', 'Write')) {
-            $disasterschools = new M_disasterschools();
-            $data = setPageData_paging($disasterschools);
-            $this->loadView('m_disasterschool/add', lang('Form.villageresistdisaster'), $data);
+        $res = $this->hasPermission('m_disasterschool', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasterschools = new M_disasterschools();
+        $data = setPageData_paging($disasterschools);
+        $this->loadView('m_disasterschool/add', lang('Form.villageresistdisaster'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_disasterschool', 'Write')) {
+        $res = $this->hasPermission('m_disasterschool', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-            $disasterschools = new M_disasterschools();
-            $disasterschools->parseFromRequest();
-            $disasterschools->IsActive = 1;
+        $disasterschools = new M_disasterschools();
+        $disasterschools->parseFromRequest();
+        $disasterschools->IsActive = 1;
 
-            try {
-                $disasterschools->validate();
+        try {
+            $disasterschools->validate();
 
-                $file = $this->request->getFileMultiple('photo');
-                $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
-                if ($fileCls->upload($file)) {
-                    $disasterschools->PhotoUrl = $fileCls->getFileUrl();
-                    $disasterschools->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mdisasterschool/add')->go();
-                    // echo json_encode($disasterschools);
-                } else {
+            $file = $this->request->getFileMultiple('photo');
+            $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
+            if ($fileCls->upload($file)) {
+                $disasterschools->PhotoUrl = $fileCls->getFileUrl();
+                $disasterschools->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mdisasterschool/add')->go();
+                // echo json_encode($disasterschools);
+            } else {
 
-                    Session::setFlash('add_warning_msg', array(0 => $fileCls->getErrorMessage()));
-                    return Redirect::redirect('mdisasterschool/add')->with($disasterschools)->go();
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg',  array(0 => $e->getMessages()));
+                Session::setFlash('add_warning_msg', array(0 => $fileCls->getErrorMessage()));
                 return Redirect::redirect('mdisasterschool/add')->with($disasterschools)->go();
             }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg',  array(0 => $e->getMessages()));
+            return Redirect::redirect('mdisasterschool/add')->with($disasterschools)->go();
         }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_disasterschool', 'Write')) {
-
-            $disasterschools = M_disasterschools::find($id);
-            $data['model'] = $disasterschools;
-            $this->loadView('m_disasterschool/edit', lang('Form.villageresistdisaster'), $data);
-        } else {
-
-            return Redirect::redirect("Forbidden");
+        $res = $this->hasPermission('m_disasterschool', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasterschools = M_disasterschools::find($id);
+        $data['model'] = $disasterschools;
+        $this->loadView('m_disasterschool/edit', lang('Form.villageresistdisaster'), $data);
+       
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_disasterschool', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-
-            $disasterschools = M_disasterschools::find($id);
-            $oldmodel = clone $disasterschools;
-
-            $disasterschools->parseFromRequest();
-
-            try {
-                $disasterschools->validate($oldmodel);
-
-
-                $file = $this->request->getFileMultiple('photo');
-                // echo json_encode($file);
-                if ($file['name']) {
-                    // echo json_encode($this->request->getFileMultiple('photo'));
-                    $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
-                    if ($fileCls->upload($file)) {
-
-                        unlink(FCPATH  . $oldmodel->PhotoUrl);
-                        $disasterschools->PhotoUrl = $fileCls->getFileUrl();
-                        $disasterschools->save();
-                        Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                        return Redirect::redirect('mdisasterschool');
-                    } else {
-                        throw new EloquentException($fileCls->getErrorMessage(), $disasterschools);
-                    }
-                } else {
-                    $disasterschools->save();
-                    return Redirect::redirect('mdisasterschool');
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg',  array(0 => $e->getMessages()));
-                return Redirect::redirect("mdisasterschool/edit/{$id}")->with($disasterschools)->go();
-            }
+        $res = $this->hasPermission('m_disasterschool', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+
+        $disasterschools = M_disasterschools::find($id);
+        $oldmodel = clone $disasterschools;
+
+        $disasterschools->parseFromRequest();
+
+        try {
+            $disasterschools->validate($oldmodel);
+
+
+            $file = $this->request->getFileMultiple('photo');
+            // echo json_encode($file);
+            if ($file['name']) {
+                // echo json_encode($this->request->getFileMultiple('photo'));
+                $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
+                if ($fileCls->upload($file)) {
+
+                    unlink(FCPATH  . $oldmodel->PhotoUrl);
+                    $disasterschools->PhotoUrl = $fileCls->getFileUrl();
+                    $disasterschools->save();
+                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                    return Redirect::redirect('mdisasterschool');
+                } else {
+                    throw new EloquentException($fileCls->getErrorMessage(), $disasterschools);
+                }
+            } else {
+                $disasterschools->save();
+                return Redirect::redirect('mdisasterschool');
+            }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg',  array(0 => $e->getMessages()));
+            return Redirect::redirect("mdisasterschool/edit/{$id}")->with($disasterschools)->go();
+        }
+    
     }
 
 
@@ -134,7 +143,11 @@ class M_disasterschool extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_disasterschool', 'Delete')) {
+        $res = $this->hasPermission('m_disasterschool', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_disasterschools::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -146,9 +159,7 @@ class M_disasterschool extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

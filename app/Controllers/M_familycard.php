@@ -19,76 +19,91 @@ class M_familycard extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_familycard', 'Read')) {
-
-            $this->loadView('m_familycard/index', lang('Form.familycard'));
+        $res = $this->hasPermission('m_familycard', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_familycard/index', lang('Form.familycard'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-            $familycards = new M_familycards();
-            $data = setPageData_paging($familycards);
-            $this->loadView('m_familycard/add', lang('Form.familycard'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $familycards = new M_familycards();
+        $data = setPageData_paging($familycards);
+        $this->loadView('m_familycard/add', lang('Form.familycard'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $familycards = new M_familycards();
-            $familycards->parseFromRequest();
-
-            try {
-                $familycards->validate();
-
-                $familycards->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mfamilycard/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mfamilycard/add')->with($familycards)->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $familycards = new M_familycards();
+        $familycards->parseFromRequest();
+
+        try {
+            $familycards->validate();
+
+            $familycards->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mfamilycard/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mfamilycard/add')->with($familycards)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_familycard', 'Write')) {
-
-            $familycards = M_familycards::find($id);
-
-            $data['model'] = $familycards;
-            $this->loadView('m_familycard/edit', lang('Form.familycard'), $data);
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $familycards = M_familycards::find($id);
+
+        $data['model'] = $familycards;
+        $this->loadView('m_familycard/edit', lang('Form.familycard'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_familycard', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $familycards = M_familycards::find($id);
-            $oldmodel = clone $familycards;
-
-            $familycards->parseFromRequest();
-
-            try {
-                $familycards->validate($oldmodel);
-                $familycards->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mfamilycard')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mfamilycard')->with($familycards)->go();
-            }
+        $res = $this->hasPermission('m_familycard', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $familycards = M_familycards::find($id);
+        $oldmodel = clone $familycards;
+
+        $familycards->parseFromRequest();
+
+        try {
+            $familycards->validate($oldmodel);
+            $familycards->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mfamilycard')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mfamilycard')->with($familycards)->go();
+        }
+    
     }
 
 
@@ -96,7 +111,12 @@ class M_familycard extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_familycard', 'Delete')) {
+        $res = $this->hasPermission('m_familycard', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
+
 
             $model = M_familycards::find($id);
             $result = $model->delete();
@@ -109,8 +129,6 @@ class M_familycard extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

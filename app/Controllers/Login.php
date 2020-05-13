@@ -48,6 +48,7 @@ class Login extends Base_Controller
     public function dologout()
     {
         Session::destroy();
+        // Session::stop();
         return Redirect::redirect('welcome')->go();
     }
 }

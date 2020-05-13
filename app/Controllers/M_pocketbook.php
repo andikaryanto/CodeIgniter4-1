@@ -22,95 +22,105 @@ class M_pocketbook extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_pocketbook', 'Read')) {
-
-            $this->loadView('m_pocketbook/index', lang('Form.pocketbook'));
+        $res = $this->hasPermission('m_pocketbook', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_pocketbook/index', lang('Form.pocketbook'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_pocketbook', 'Write')) {
-            $pocketbooks = new M_pocketbooks();
-            $data = setPageData_paging($pocketbooks);
-            $this->loadView('m_pocketbook/add', lang('Form.pocketbook'), $data);
+        $res = $this->hasPermission('m_pocketbook', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $pocketbooks = new M_pocketbooks();
+        $data = setPageData_paging($pocketbooks);
+        $this->loadView('m_pocketbook/add', lang('Form.pocketbook'), $data);
+    
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_pocketbook', 'Write')) {
-
-            $pocketbooks = new M_pocketbooks();
-            $pocketbooks->parseFromRequest();
-            try {
-                $pocketbooks->validate();
-                $file = $this->request->getFiles('photo');
-                $photo = new File("assets/upload/pocketbook", ["pdf"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    $pocketbooks->FileUrl = $photo->getFileUrl();
-                    $pocketbooks->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mpocketbook/add')->go();
-                } else {
-
-                    throw new EloquentException($photo->getErrorMessage(), $pocketbooks, ResponseCode::INVALID_DATA);
-                }
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mpocketbook/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_pocketbook', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $pocketbooks = new M_pocketbooks();
+        $pocketbooks->parseFromRequest();
+        try {
+            $pocketbooks->validate();
+            $file = $this->request->getFiles('photo');
+            $photo = new File("assets/upload/pocketbook", ["pdf"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                $pocketbooks->FileUrl = $photo->getFileUrl();
+                $pocketbooks->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mpocketbook/add')->go();
+            } else {
+
+                throw new EloquentException($photo->getErrorMessage(), $pocketbooks, ResponseCode::INVALID_DATA);
+            }
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mpocketbook/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_pocketbook', 'Write')) {
-
-            $pocketbooks = M_pocketbooks::find($id);
-            $data['model'] = $pocketbooks;
-            $this->loadView('m_pocketbook/edit', lang('Form.pocketbook'), $data);
-        } else {
-
-            return Redirect::redirect("Forbidden");
+        $res = $this->hasPermission('m_pocketbook', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $pocketbooks = M_pocketbooks::find($id);
+        $data['model'] = $pocketbooks;
+        $this->loadView('m_pocketbook/edit', lang('Form.pocketbook'), $data);
+       
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_pocketbook', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $pocketbooks = M_pocketbooks::find($id);
-            $oldmodel = clone $pocketbooks;
-
-            $pocketbooks->parseFromRequest();
-
-            try {
-                $pocketbooks->validate($oldmodel);
-                $file = $this->request->getFiles('photo');
-                $photo = new File("assets/upload/pocketbook", ["jpg", "jpeg", "png"]);
-                $result = $photo->upload($file);
-                if ($result) {
-                    if ($pocketbooks->FileUrl)
-                        unlink(FCPATH  . $oldmodel->FileUrl);
-
-                    $pocketbooks->FileUrl = $photo->getFileUrl();
-                    $pocketbooks->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('mpocketbook')->go();
-                } else {
-                    throw new EloquentException($photo->getErrorMessage(), $pocketbooks);
-                }
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mpocketbook/edit/{$id}")->with($pocketbooks)->go();
-            }
+        $res = $this->hasPermission('m_pocketbook', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $pocketbooks = M_pocketbooks::find($id);
+        $oldmodel = clone $pocketbooks;
+
+        $pocketbooks->parseFromRequest();
+
+        try {
+            $pocketbooks->validate($oldmodel);
+            $file = $this->request->getFiles('photo');
+            $photo = new File("assets/upload/pocketbook", ["jpg", "jpeg", "png"]);
+            $result = $photo->upload($file);
+            if ($result) {
+                if ($pocketbooks->FileUrl)
+                    unlink(FCPATH  . $oldmodel->FileUrl);
+
+                $pocketbooks->FileUrl = $photo->getFileUrl();
+                $pocketbooks->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('mpocketbook')->go();
+            } else {
+                throw new EloquentException($photo->getErrorMessage(), $pocketbooks);
+            }
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mpocketbook/edit/{$id}")->with($pocketbooks)->go();
+        }
+        
     }
 
 
@@ -118,7 +128,11 @@ class M_pocketbook extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_pocketbook', 'Delete')) {
+        $res = $this->hasPermission('m_pocketbook', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_pocketbooks::find($id);
 
@@ -133,8 +147,6 @@ class M_pocketbook extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

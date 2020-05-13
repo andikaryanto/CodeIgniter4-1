@@ -1,10 +1,11 @@
 <?php
 namespace App\Eloquents;
 use AndikAryanto11\Eloquent;
+use CodeIgniter\Config\Services;
 
 class BaseEloquent extends Eloquent{
     
-    private $dbs;
+    public $dbs;
     private $request;
     public function __construct()
     {
@@ -56,6 +57,19 @@ class BaseEloquent extends Eloquent{
         }
 
         return $this;
+    }
+
+
+    public function beforeSave(){
+    
+        $userdata = Services::session()->get(get_variable() . 'userdata');
+        if(empty($this->{static::$primaryKey})){
+            $this->CreatedBy = $userdata['Username'];
+            $this->Created = get_db_date();
+        } else {
+            $this->ModifiedBy = $userdata['Username'];
+            $this->Modified = get_db_date();
+        }
     }
 
     private function getClass($class){

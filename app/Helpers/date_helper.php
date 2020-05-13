@@ -8,6 +8,12 @@ function get_current_date($format = null){
     
 }
 
+function get_db_date(){
+    
+    $dbs = \Config\Database::connect();
+    $data = $dbs->query('SELECT NOW() as now')->getRowObject(0);
+    return $data->now;
+}
 
 function set_date($strdate = null){
     if(!empty($strdate))

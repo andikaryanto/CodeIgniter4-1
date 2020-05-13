@@ -19,77 +19,90 @@ class M_impactcategory extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_impact', 'Read')) {
-
-            $this->loadView('m_impactcategory/index', lang('Form.impactcategory'));
+        $res = $this->hasPermission('m_impact', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_impactcategory/index', lang('Form.impactcategory'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_impact', 'Write')) {
-            $impactcategories = new M_impactcategories();
-            $data = setPageData_paging($impactcategories);
-            $this->loadView('m_impactcategory/add', lang('Form.impactcategory'), $data);
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $impactcategories = new M_impactcategories();
+        $data = setPageData_paging($impactcategories);
+        $this->loadView('m_impactcategory/add', lang('Form.impactcategory'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_impact', 'Write')) {
-
-            $impactcategories = new M_impactcategories();
-            $impactcategories->parseFromRequest();
-
-            try {
-                $impactcategories->validate();
-
-                $impactcategories->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mimpactcategory/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mimpactcategory/add")->with($impactcategories)->go();
-            }
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $impactcategories = new M_impactcategories();
+        $impactcategories->parseFromRequest();
+
+        try {
+            $impactcategories->validate();
+
+            $impactcategories->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mimpactcategory/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mimpactcategory/add")->with($impactcategories)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_impact', 'Write')) {
-
-            $impactcategories = M_impactcategories::find($id);
-
-            $data['model'] = $impactcategories;
-            $this->loadView('m_impactcategory/edit', lang('Form.impactcategory'), $data);
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $impactcategories = M_impactcategories::find($id);
+
+        $data['model'] = $impactcategories;
+        $this->loadView('m_impactcategory/edit', lang('Form.impactcategory'), $data);
+    
     }
 
     public function editsave()
     {
+        $res = $this->hasPermission('m_impact', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-        if ($this->hasPermission('m_impact', 'Write')) {
+        $id = $this->request->getPost('Id');
 
-            $id = $this->request->getPost('Id');
+        $impactcategories = M_impactcategories::find($id);
+        $oldmodel = clone $impactcategories;
 
-            $impactcategories = M_impactcategories::find($id);
-            $oldmodel = clone $impactcategories;
+        $impactcategories->parseFromRequest();
 
-            $impactcategories->parseFromRequest();
+        try {
+            $impactcategories->validate($oldmodel);
 
-            try {
-                $impactcategories->validate($oldmodel);
+            $impactcategories->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mimpactcategory')->go();
+        } catch (EloquentException $e) {
 
-                $impactcategories->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mimpactcategory')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->message));
-                return Redirect::redirect("mimpactcategoryedit/edit/{$id}")->with($impactcategories)->go();
-            }
+            Session::setFlash('edit_warning_msg', array(0 => $e->message));
+            return Redirect::redirect("mimpactcategoryedit/edit/{$id}")->with($impactcategories)->go();
         }
     }
 
@@ -98,8 +111,11 @@ class M_impactcategory extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if (isPermitted_paging($_SESSION[get_variable() . 'userdata']['M_Groupuser_Id'], form_paging()['m_impactcategory'], 'Delete')) {
+        $res = $this->hasPermission('m_impact', 'Delete');
 
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_impactcategories::find($id);
 
             $result = $model->delete();
@@ -112,8 +128,6 @@ class M_impactcategory extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

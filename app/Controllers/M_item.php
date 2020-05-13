@@ -19,84 +19,101 @@ class M_item extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_item', 'Read')) {
-            $this->loadView('m_item/index', lang('Form.item'));
+        $res = $this->hasPermission('m_item', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_item/index', lang('Form.item'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_item', 'Write')) {
-            $items = new M_items();
-            $data = setPageData_paging($items);
-            $this->loadView('m_item/add', lang('Form.item'), $data);
+        $res = $this->hasPermission('m_item', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $items = new M_items();
+        $data = setPageData_paging($items);
+        $this->loadView('m_item/add', lang('Form.item'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_item', 'Write')) {
+        $res = $this->hasPermission('m_item', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-            $items = new M_items();
-            $items->parseFromRequest();
+        $items = new M_items();
+        $items->parseFromRequest();
 
-            try {
-                $items->validate();
-                $items->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mitem/add')->go();
-            } catch (EloquentException $e) {
+        try {
+            $items->validate();
+            $items->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mitem/add')->go();
+        } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mitem/add')->with($e->getEntity())->go();
-            }
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mitem/add')->with($e->getEntity())->go();
+        
         }
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_item', 'Write')) {
-
-            $items = M_items::find($id);
-            $data['model'] = $items;
-            $this->loadView('m_item/edit', lang('Form.item'), $data);
+        $res = $this->hasPermission('m_item', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $items = M_items::find($id);
+        $data['model'] = $items;
+        $this->loadView('m_item/edit', lang('Form.item'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_item', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $items = M_items::find($id);
-            $oldmodel = clone $items;
-
-            $items->parseFromRequest();
-            // echo json_encode($items);
-
-            try {
-                $items->validate($oldmodel);
-                $items->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mitem')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mitem/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_item', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $items = M_items::find($id);
+        $oldmodel = clone $items;
+
+        $items->parseFromRequest();
+        // echo json_encode($items);
+
+        try {
+            $items->validate($oldmodel);
+            $items->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mitem')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mitem/edit/{$id}")->with($e->getEntity())->go();
+        }
+    
     }
 
     public function itemstock($itemid)
     {
 
-        if ($this->hasPermission('m_item', 'Read')) {
-            $items = M_items::find($itemid);
-            $data['model'] = $items;
-            $this->loadView('m_item/stock', lang('Form.item'), $data);
+        $res = $this->hasPermission('m_item', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $items = M_items::find($itemid);
+        $data['model'] = $items;
+        $this->loadView('m_item/stock', lang('Form.item'), $data);
+        
     }
 
 
@@ -104,7 +121,11 @@ class M_item extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_item', 'Delete')) {
+        $res = $this->hasPermission('m_item', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_items::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -116,8 +137,6 @@ class M_item extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

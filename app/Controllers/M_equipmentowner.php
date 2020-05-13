@@ -20,91 +20,103 @@ class M_equipmentowner extends Base_Controller
 
     public function index($idequipment)
     {
-        if ($this->hasPermission('m_equipment', 'Read')) {
-
-
-            $result = M_equipments::find($idequipment);
-            $data['model'] = $result;
-
-            $this->loadView('m_equipmentowner/index', lang('Form.equipmentowner'), $data);
+        $res = $this->hasPermission('m_equipment', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+
+        $result = M_equipments::find($idequipment);
+        $data['model'] = $result;
+
+        $this->loadView('m_equipmentowner/index', lang('Form.equipmentowner'), $data);
+        
     }
 
     public function add($idequipment)
     {
-        if ($this->hasPermission('m_equipment', 'Write')) {
-
-
-            $result = M_equipments::find($idequipment);
-
-            $equipmentowners = new M_equipmentowners();
-
-            $data = setPageData_paging($equipmentowners);
-
-            $data['equipment'] = $result;
-            $this->loadView('m_equipmentowner/add', lang('Form.equipmentowner'), $data);
+        $res = $this->hasPermission('m_equipment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = M_equipments::find($idequipment);
+
+        $equipmentowners = new M_equipmentowners();
+
+        $data = setPageData_paging($equipmentowners);
+
+        $data['equipment'] = $result;
+        $this->loadView('m_equipmentowner/add', lang('Form.equipmentowner'), $data);
+    
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_equipment', 'Write')) {
-
-
-            $equipmentowners = new M_equipmentowners();
-            $equipmentowners->parseFromRequest();
-
-            try {
-                $equipmentowners->validate();
-
-                $equipmentowners->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->with($equipmentowners)->go();
-            }
+        $res = $this->hasPermission('m_equipment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $equipmentowners = new M_equipmentowners();
+        $equipmentowners->parseFromRequest();
+
+        try {
+            $equipmentowners->validate();
+
+            $equipmentowners->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mequipmentowner/add/{$equipmentowners->M_Equipment_Id}")->with($equipmentowners)->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_equipment', 'Write')) {
-
-            $equipmentowners = M_equipmentowners::find($id);
-
-            $result = M_equipments::find($equipmentowners->M_Equipment_Id);
-
-            $data['model'] = $equipmentowners;
-            $data['equipment'] = $result;
-            $this->loadView('m_equipmentowner/edit', lang('Form.equipmentowner'), $data);
+        $res = $this->hasPermission('m_equipment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $equipmentowners = M_equipmentowners::find($id);
+
+        $result = M_equipments::find($equipmentowners->M_Equipment_Id);
+
+        $data['model'] = $equipmentowners;
+        $data['equipment'] = $result;
+        $this->loadView('m_equipmentowner/edit', lang('Form.equipmentowner'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_equipment', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $equipmentowners = M_equipmentowners::find($id);
-            $oldmodel = clone $equipmentowners;
-
-            $equipmentowners->parseFromRequest();
-
-            try {
-                $equipmentowners->validate($oldmodel);
-
-                $equipmentowners->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mequipmentowner/$equipmentowners->M_Equipment_Id")->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mequipmentowner/edit/{$id}")->with($equipmentowners)->go();
-            }
+        $res = $this->hasPermission('m_equipment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $equipmentowners = M_equipmentowners::find($id);
+        $oldmodel = clone $equipmentowners;
+
+        $equipmentowners->parseFromRequest();
+
+        try {
+            $equipmentowners->validate($oldmodel);
+
+            $equipmentowners->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mequipmentowner/$equipmentowners->M_Equipment_Id")->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mequipmentowner/edit/{$id}")->with($equipmentowners)->go();
+        }
+        
     }
 
 
@@ -112,7 +124,11 @@ class M_equipmentowner extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_equipment', 'Delete')) {
+        $res = $this->hasPermission('m_equipment', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_equipmentowners::find($id);
             $result = $model->delete();
@@ -125,9 +141,7 @@ class M_equipmentowner extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData($idequipment)

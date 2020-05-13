@@ -23,85 +23,101 @@ class M_earlywarning extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_earlywarning', 'Read')) {
-            $this->loadView('m_earlywarning/index', lang('Form.earlywarning'));
+        $res = $this->hasPermission('m_earlywarning', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_earlywarning/index', lang('Form.earlywarning'));
+    
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_earlywarning', 'Write')) {
-            $earlywarnings = new M_earlywarnings();
-            $data = setPageData_paging($earlywarnings);
-            $this->loadView('m_earlywarning/add', lang('Form.earlywarning'), $data);
+        $res = $this->hasPermission('m_earlywarning', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $earlywarnings = new M_earlywarnings();
+        $data = setPageData_paging($earlywarnings);
+        $this->loadView('m_earlywarning/add', lang('Form.earlywarning'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_earlywarning', 'Write')) {
-            $earlywarnings = new M_earlywarnings();
-            $earlywarnings->parseFromRequest();
-            $earlywarnings->DateEnd = get_formated_date($earlywarnings->Date . " " . $earlywarnings->TimeEnd, "Y-m-d H:i:s");
-            try {
-                $earlywarnings->validate();
-                $photourl = null;
-
-                $file = $this->request->getFiles('photo');
-                if ($file['name']) {
-                    $photo = new File("assets/upload/earlywarning", ["jpg", "jpeg"]);
-                    $result = $photo->upload($file);
-                    $photourl = $photo->getFileUrl();
-                    $earlywarnings->PhotoUrl = $photourl;
-                }
-                // echo $photourl;
-
-                $id = $earlywarnings->save();
-                if ($id) {
-                    $this->sendNotification($earlywarnings->TypeWarning, $earlywarnings->Description);
-                }
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mearlywarning/add')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->message));
-                return Redirect::redirect('mearlywarning/add')->with($earlywarnings)->go();
-            }
+        $res = $this->hasPermission('m_earlywarning', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $earlywarnings = new M_earlywarnings();
+        $earlywarnings->parseFromRequest();
+        $earlywarnings->DateEnd = get_formated_date($earlywarnings->Date . " " . $earlywarnings->TimeEnd, "Y-m-d H:i:s");
+        try {
+            $earlywarnings->validate();
+            $photourl = null;
+
+            $file = $this->request->getFiles('photo');
+            if ($file['name']) {
+                $photo = new File("assets/upload/earlywarning", ["jpg", "jpeg"]);
+                $result = $photo->upload($file);
+                $photourl = $photo->getFileUrl();
+                $earlywarnings->PhotoUrl = $photourl;
+            }
+            // echo $photourl;
+
+            $id = $earlywarnings->save();
+            if ($id) {
+                $this->sendNotification($earlywarnings->TypeWarning, $earlywarnings->Description);
+            }
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mearlywarning/add')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->message));
+            return Redirect::redirect('mearlywarning/add')->with($earlywarnings)->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_earlywarning', 'Write')) {
-
-            $earlywarnings = M_earlywarnings::find($id);
-            $earlywarnings->Date = get_formated_date($earlywarnings->Date, "d-m-Y");
-            $data['model'] = $earlywarnings;
-            $this->loadView('m_earlywarning/edit', lang('Form.earlywarning'), $data);
+        $res = $this->hasPermission('m_earlywarning', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $earlywarnings = M_earlywarnings::find($id);
+        $earlywarnings->Date = get_formated_date($earlywarnings->Date, "d-m-Y");
+        $data['model'] = $earlywarnings;
+        $this->loadView('m_earlywarning/edit', lang('Form.earlywarning'), $data);
+    
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_earlywarning', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $earlywarnings = M_earlywarnings::find($id);
-            $oldmodel = clone $earlywarnings;
-
-            $earlywarnings->parseFromRequest();
-
-            try {
-                $earlywarnings->validate($oldmodel);
-                $earlywarnings->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mearlywarning')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', $e->message);
-                return Redirect::redirect("mearlywarning/edit/{$id}")->with($earlywarnings)->go();
-            }
+        $res = $this->hasPermission('m_earlywarning', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $earlywarnings = M_earlywarnings::find($id);
+        $oldmodel = clone $earlywarnings;
+
+        $earlywarnings->parseFromRequest();
+
+        try {
+            $earlywarnings->validate($oldmodel);
+            $earlywarnings->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mearlywarning')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', $e->message);
+            return Redirect::redirect("mearlywarning/edit/{$id}")->with($earlywarnings)->go();
+        }
+    
     }
 
 
@@ -109,7 +125,11 @@ class M_earlywarning extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_earlywarning', 'Delete')) {
+        $res = $this->hasPermission('m_earlywarning', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_earlywarnings::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -121,8 +141,6 @@ class M_earlywarning extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

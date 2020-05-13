@@ -11,7 +11,7 @@ class Home extends Base_Controller{
     
     public function index(){
         if(empty(Session::get(get_variable().'userdata'))){
-            Redirect::redirect('welcome')->go();
+            return Redirect::redirect('welcome')->go();
         }
 
         $currentyear= get_current_date("Y");

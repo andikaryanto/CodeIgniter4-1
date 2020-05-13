@@ -22,100 +22,113 @@ class M_groupuser extends Base_Controller
     public function index()
     {
 
-        if ($this->hasPermission('m_groupuser', 'Read')) {
-            $this->loadView('m_groupuser/index', lang('Form.groupuser'));
+        $res = $this->hasPermission('m_groupuser', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_groupuser/index', lang('Form.groupuser'));
+        
     }
 
     public function add()
     {
 
-        if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupusers = new M_groupusers();
-            $data = setPageData_paging($groupusers);
-            $this->loadView('m_groupuser/add', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $groupusers = new M_groupusers();
+        $data = setPageData_paging($groupusers);
+        $this->loadView('m_groupuser/add', lang('Form.groupuser'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_groupuser', 'Write')) {
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-            $groupusers = new M_groupusers();
-            $groupusers->parseFromRequest();
+        $groupusers = new M_groupusers();
+        $groupusers->parseFromRequest();
 
-            try {
-                $groupusers->validate();
-                $groupusers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mgroupuser/add')->go();
-            } catch (EloquentException $e) {
+        try {
+            $groupusers->validate();
+            $groupusers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mgroupuser/add')->go();
+        } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mgroupuser/add')->with($groupusers)->go();
-            }
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mgroupuser/add')->with($groupusers)->go();
+        
         }
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupusers = M_groupusers::find($id);
-            $data['model'] = $groupusers;
-            $this->loadView('m_groupuser/edit', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $groupusers = M_groupusers::find($id);
+        $data['model'] = $groupusers;
+        $this->loadView('m_groupuser/edit', lang('Form.groupuser'), $data);
+        
     }
 
     public function editsave()
     {
-        if ($this->hasPermission('m_groupuser', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $groupusers = M_groupusers::find($id);
-            $oldmodel = clone $groupusers;
-
-            $groupusers->parseFromRequest();
-
-            try {
-                $groupusers->validate($oldmodel);
-
-                $groupusers->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mgroupuser')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mgroupuser/edit/{$id}")->with($groupusers)->go();
-            }
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $groupusers = M_groupusers::find($id);
+        $oldmodel = clone $groupusers;
+
+        $groupusers->parseFromRequest();
+
+        try {
+            $groupusers->validate($oldmodel);
+
+            $groupusers->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mgroupuser')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mgroupuser/edit/{$id}")->with($groupusers)->go();
+        }
+        
     }
 
     public function editrole($groupid)
     {
-        if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupuser = new M_groupusers();
-            $groups = $groupuser->find($groupid);
-            //$modeldetail = $modelheader->View_m_accessrole();
-
-            //$data =  $this->paging->set_data_page_index($modeldetail, null, null, null, $modelheader);
-            $data['model'] = $groups;
-            $this->loadView('m_groupuser/roles', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $groups = M_groupusers::find($groupid);
+        $data['model'] = $groups;
+        $this->loadView('m_groupuser/roles', lang('Form.groupuser'), $data);
+        
     }
 
     public function editreportrole($groupid)
     {
 
-        if ($this->hasPermission('m_groupuser', 'Write')) {
-            $groupuser = new M_groupusers();
-            $modelheader = $groupuser->find($groupid);
-            //$modeldetail = $modelheader->View_m_accessrole();
-
-            //$data =  $this->paging->set_data_page_index($modeldetail, null, null, null, $modelheader);
-            $data['model'] = $modelheader;
-            $this->loadView('m_groupuser/reportRoles', lang('Form.groupuser'), $data);
+        $res = $this->hasPermission('m_groupuser', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $modelheader = M_groupusers::find($groupid);
+        $data['model'] = $modelheader;
+        $this->loadView('m_groupuser/reportRoles', lang('Form.groupuser'), $data);
+        
     }
 
     public function saverole()
@@ -196,7 +209,11 @@ class M_groupuser extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_groupuser', 'Delete')) {
+        $res = $this->hasPermission('m_groupuser', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_groupusers::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -208,8 +225,6 @@ class M_groupuser extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

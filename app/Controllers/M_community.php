@@ -19,78 +19,95 @@ class M_community extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_community', 'Read')) {
-
-            $this->loadView('m_community/index', lang('Form.community'));
+        
+        $res = $this->hasPermission('m_community', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_community/index', lang('Form.community'));
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_community', 'Write')) {
-            $communities = new M_communities();
-            $communities->EndService = get_formated_date(null, "d-m-Y");
-            $communities->FoundOn = get_formated_date(null, "d-m-Y");
-            $data = setPageData_paging($communities);
-            $this->loadView('m_community/add', lang('Form.community'), $data);
+        $res = $this->hasPermission('m_community', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $communities = new M_communities();
+        $communities->EndService = get_formated_date(null, "d-m-Y");
+        $communities->FoundOn = get_formated_date(null, "d-m-Y");
+        $data = setPageData_paging($communities);
+        $this->loadView('m_community/add', lang('Form.community'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_community', 'Write')) {
-
-            $communities = new M_communities();
-            $communities->parseFromRequest();
-            try {
-
-                $communities->validate();
-
-                $communities->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mcommunity/add')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mcommunity/add')->with($communities)->go();
-            }
+        $res = $this->hasPermission('m_community', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $communities = new M_communities();
+        $communities->parseFromRequest();
+        try {
+
+            $communities->validate();
+
+            $communities->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mcommunity/add')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mcommunity/add')->with($communities)->go();
+        }
+    
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_community', 'Write')) {
-
-            $communities = M_communities::find($id);
-            $communities->EndService = get_formated_date($communities->EndService, "d-m-Y");
-            $communities->FoundOn = get_formated_date($communities->FoundOn, "d-m-Y");
-            $data['model'] = $communities;
-            $this->loadView('m_community/edit', lang('Form.community'), $data);
+       
+        $res = $this->hasPermission('m_community', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $communities = M_communities::find($id);
+        $communities->EndService = get_formated_date($communities->EndService, "d-m-Y");
+        $communities->FoundOn = get_formated_date($communities->FoundOn, "d-m-Y");
+        $data['model'] = $communities;
+        $this->loadView('m_community/edit', lang('Form.community'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_community', 'Write')) {
+        
+        $res = $this->hasPermission('m_community', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-            $id = $this->request->getPost('Id');
-            $communities = M_communities::find($id);
-            $oldmodel = clone $communities;
+        $id = $this->request->getPost('Id');
+        $communities = M_communities::find($id);
+        $oldmodel = clone $communities;
 
-            $communities->parseFromRequest();
+        $communities->parseFromRequest();
 
-            try {
+        try {
 
-                $communities->validate($oldmodel);
+            $communities->validate($oldmodel);
 
-                $communities->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mcommunity')->go();
-            } catch (EloquentException $e) {
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mcommunity/edit/{$id}")->with($communities)->go();
-            }
+            $communities->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mcommunity')->go();
+        } catch (EloquentException $e) {
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mcommunity/edit/{$id}")->with($communities)->go();
         }
     }
 
@@ -99,7 +116,11 @@ class M_community extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_community', 'Delete')) {
+        $res = $this->hasPermission('m_community', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_communities::find($id);
 

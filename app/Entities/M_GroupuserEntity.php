@@ -4,8 +4,8 @@ namespace App\Entities;
 use App\Classes\Exception\EntityException;
 use App\Entities\BaseEntity;
 use App\Libraries\ResponseCode;
-use App\Models\M_accessroles;
-use App\Models\R_reportaccessroles;
+use App\Eloquents\M_accessroles;
+use App\Eloquents\R_reportaccessroles;
 use Core\Database\DBBuilder;
 
 class M_GroupuserEntity extends BaseEntity {

@@ -20,73 +20,86 @@ class M_instance extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_instance', 'Read')) {
-
-            $this->loadView('m_instance/index', lang('Form.instance'));
+        $res = $this->hasPermission('m_instance', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_instance/index', lang('Form.instance'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_instance', 'Write')) {
-            $instances = new M_instances();
-            $data = setPageData_paging($instances);
-            $this->loadView('m_instance/add', lang('Form.instance'), $data);
+        $res = $this->hasPermission('m_instance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $instances = new M_instances();
+        $data = setPageData_paging($instances);
+        $this->loadView('m_instance/add', lang('Form.instance'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('m_instance', 'Write')) {
-
-            $instances = new M_instances();
-            $instances->parseFromRequest();
-            try {
-                $instances->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('minstance/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("minstance/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_instance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $instances = new M_instances();
+        $instances->parseFromRequest();
+        try {
+            $instances->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('minstance/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("minstance/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_instance', 'Write')) {
-
-            $instances = M_instances::find($id);
-            $data['model'] = $instances;
-            $this->loadView('m_instance/edit', lang('Form.instance'), $data);
+        $res = $this->hasPermission('m_instance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $instances = M_instances::find($id);
+        $data['model'] = $instances;
+        $this->loadView('m_instance/edit', lang('Form.instance'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('m_instance', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $instances = M_instances::find($id);
-            $oldmodel = clone $instances;
-
-            $instances->parseFromRequest();
-
-            try {
-                $instances->validate($oldmodel);
-                $instances->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('minstance')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("minstance/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_instance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $instances = M_instances::find($id);
+        $oldmodel = clone $instances;
+
+        $instances->parseFromRequest();
+
+        try {
+            $instances->validate($oldmodel);
+            $instances->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('minstance')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("minstance/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -94,8 +107,11 @@ class M_instance extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_instance', 'Delete')) {
+        $res = $this->hasPermission('m_instance', 'Delete');
 
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_instances::find($id);
 
             $result = $model->delete();
@@ -109,8 +125,6 @@ class M_instance extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

@@ -19,75 +19,92 @@ class M_livestock extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_livestock', 'Read')) {
-            $this->loadView('m_livestock/index', lang('Form.livestock'));
+        
+        $res = $this->hasPermission('m_livestock', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_livestock/index', lang('Form.livestock'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_livestock', 'Write')) {
-            $livestocks = new M_livestocks();
-            $data = setPageData_paging($livestocks);
-            $this->loadView('m_livestock/add', lang('Form.livestock'), $data);
+        
+        $res = $this->hasPermission('m_livestock', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $livestocks = new M_livestocks();
+        $data = setPageData_paging($livestocks);
+        $this->loadView('m_livestock/add', lang('Form.livestock'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_livestock', 'Write')) {
-            $livestocks = new M_livestocks();
-            $livestocks->parseFromRequest();
+        
+        $res = $this->hasPermission('m_livestock', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+    }
+        $livestocks = new M_livestocks();
+        $livestocks->parseFromRequest();
 
-            try {
-                $livestocks->validate();
+        try {
+            $livestocks->validate();
 
-                $livestocks->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mlivestock/add')->go();
-            } catch (EloquentException $e) {
+            $livestocks->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mlivestock/add')->go();
+        } catch (EloquentException $e) {
 
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mlivestock/add")->with($e->getEntity())->go();
-            }
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mlivestock/add")->with($e->getEntity())->go();
         }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_livestock', 'Write')) {
-
-            $livestocks = M_livestocks::find($id);
-            $data['model'] = $livestocks;
-            $this->loadView('m_livestock/edit', lang('Form.livestock'), $data);
+        $res = $this->hasPermission('m_livestock', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $livestocks = M_livestocks::find($id);
+        $data['model'] = $livestocks;
+        $this->loadView('m_livestock/edit', lang('Form.livestock'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_livestock', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-
-            $livestocks = M_livestocks::find($id);
-            $oldmodel = clone $livestocks;
-
-            $livestocks->parseFromRequest();
-
-            try {
-                $livestocks->validate($oldmodel);
-
-                $livestocks->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mlivestock')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mlivestock/edit/{$livestocks}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_livestock', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+
+        $livestocks = M_livestocks::find($id);
+        $oldmodel = clone $livestocks;
+
+        $livestocks->parseFromRequest();
+
+        try {
+            $livestocks->validate($oldmodel);
+
+            $livestocks->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mlivestock')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mlivestock/edit/{$livestocks}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -95,7 +112,11 @@ class M_livestock extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_livestock', 'Delete')) {
+        $res = $this->hasPermission('m_livestock', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_livestocks::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -107,8 +128,6 @@ class M_livestock extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

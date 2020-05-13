@@ -20,75 +20,88 @@ class M_safedistance extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_safedistance', 'Read')) {
-
-            $this->loadView('m_safedistance/index', lang('Form.safedistance'));
+        
+        $res = $this->hasPermission('m_safedistance', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('m_safedistance/index', lang('Form.safedistance'));
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_safedistance', 'Write')) {
-            $safedistances = new M_safedistances();
-            $data = setPageData_paging($safedistances);
-            $this->loadView('m_safedistance/add', lang('Form.safedistance'), $data);
+        
+        $res = $this->hasPermission('m_safedistance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $safedistances = new M_safedistances();
+        $data = setPageData_paging($safedistances);
+        $this->loadView('m_safedistance/add', lang('Form.safedistance'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('m_safedistance', 'Write')) {
-
-            $safedistances = new M_safedistances();
-            $safedistances->parseFromRequest();
-            try {
-                $safedistances->validate();
-
-                $safedistances->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('msafedistance/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("msafedistance/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_safedistance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $safedistances = new M_safedistances();
+        $safedistances->parseFromRequest();
+        try {
+            $safedistances->validate();
+
+            $safedistances->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('msafedistance/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("msafedistance/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_safedistance', 'Write')) {
-
-            $safedistances = M_safedistances::find($id);
-            $data['model'] = $safedistances;
-            $this->loadView('m_safedistance/edit', lang('Form.safedistance'), $data);
+        $res = $this->hasPermission('m_safedistance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $safedistances = M_safedistances::find($id);
+        $data['model'] = $safedistances;
+        $this->loadView('m_safedistance/edit', lang('Form.safedistance'), $data);
+    
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_safedistance', 'Write')) {
+        $res = $this->hasPermission('m_safedistance', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $id = $this->request->getPost('Id');
 
-            $id = $this->request->getPost('Id');
+        $safedistances = M_safedistances::find($id);
+        $oldmodel = clone $safedistances;
 
-            $safedistances = M_safedistances::find($id);
-            $oldmodel = clone $safedistances;
+        $safedistances->parseFromRequest();
 
-            $safedistances->parseFromRequest();
+        try {
+            $safedistances->validate($oldmodel);
 
-            try {
-                $safedistances->validate($oldmodel);
+            $safedistances->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('msafedistance')->go();
+        } catch (EloquentException $e) {
 
-                $safedistances->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('msafedistance')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("msafedistance/edit/{$id}")->with($e->getEntity())->go();
-            }
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("msafedistance/edit/{$id}")->with($e->getEntity())->go();
         }
     }
 
@@ -97,7 +110,11 @@ class M_safedistance extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_safedistance', 'Delete')) {
+        $res = $this->hasPermission('m_safedistance', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = M_safedistances::find($id);
 

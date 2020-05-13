@@ -181,7 +181,7 @@ class M_groupusers extends BaseEloquent {
     }
 
     public function view_m_accessrole(){
-        $result = $this->db->query("
+        $result = $this->dbs->query("
             SELECT * 
             FROM view_m_accessroles
             WHERE (M_Groupuser_Id = '{$this->Id}') OR M_Groupuser_Id IS NULL
@@ -193,7 +193,7 @@ class M_groupusers extends BaseEloquent {
 
     public function view_r_reportaccessrole(){
         
-        $result = $this->db->query("
+        $result = $this->dbs->query("
             SELECT * 
             FROM view_r_reportaccessroles
             WHERE (GroupId = '{$this->Id}') OR GroupId IS NULL

@@ -19,87 +19,103 @@ class M_warehouse extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_warehouse', 'Read')) {
-            // $warehouses = new M_warehouses();
-
-            // $result = $warehouses->findAll();
-            // $data['model'] = $result;
-            $this->loadView('m_warehouse/index', lang('Form.warehouse'));
+        $res = $this->hasPermission('m_warehouse', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_warehouse/index', lang('Form.warehouse'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_warehouse', 'Write')) {
-            $warehouses = new M_warehouses();
-            $data = setPageData_paging($warehouses);
-            $this->loadView('m_warehouse/add', lang('Form.warehouse'), $data);
+        
+        $res = $this->hasPermission('m_warehouse', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $warehouses = new M_warehouses();
+        $data = setPageData_paging($warehouses);
+        $this->loadView('m_warehouse/add', lang('Form.warehouse'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_warehouse', 'Write')) {
-
-            $warehouses = new M_warehouses();
-            $warehouses->parseFromRequest();
-
-            try {
-                $warehouses->validate();
-
-
-                $warehouses->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mwarehouse/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mwarehouse/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_warehouse', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $warehouses = new M_warehouses();
+        $warehouses->parseFromRequest();
+
+        try {
+            $warehouses->validate();
+
+
+            $warehouses->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mwarehouse/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mwarehouse/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_warehouse', 'Write')) {
-
-            $warehouses = M_warehouses::find($id);
-            $data['model'] = $warehouses;
-            $this->loadView('m_warehouse/edit', lang('Form.warehouse'), $data);
+        $res = $this->hasPermission('m_warehouse', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $warehouses = M_warehouses::find($id);
+        $data['model'] = $warehouses;
+        $this->loadView('m_warehouse/edit', lang('Form.warehouse'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_warehouse', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $warehouses = M_warehouses::find($id);
-            $oldmodel = clone $warehouses;
-
-            $warehouses->parseFromRequest();
-            // echo json_encode($warehouses);
-
-            try {
-                $warehouses->validate($oldmodel);
-                $warehouses->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('mwarehouse')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mwarehouse/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_warehouse', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $warehouses = M_warehouses::find($id);
+        $oldmodel = clone $warehouses;
+
+        $warehouses->parseFromRequest();
+        // echo json_encode($warehouses);
+
+        try {
+            $warehouses->validate($oldmodel);
+            $warehouses->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('mwarehouse')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mwarehouse/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function delete()
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_warehouse', 'Delete')) {
+        $res = $this->hasPermission('m_capability', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_warehouses::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -111,8 +127,6 @@ class M_warehouse extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

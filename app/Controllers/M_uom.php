@@ -20,75 +20,90 @@ class M_uom extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('m_uom', 'Read')) {
-            $this->loadView('m_uom/index', lang('Form.uom'));
+        $res = $this->hasPermission('m_uom', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('m_uom/index', lang('Form.uom'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_uom', 'Write')) {
-            $uoms = new M_uoms();
-            $data = setPageData_paging($uoms);
-            $this->loadView('m_uom/add', lang('Form.uom'), $data);
+        $res = $this->hasPermission('m_uom', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $uoms = new M_uoms();
+        $data = setPageData_paging($uoms);
+        $this->loadView('m_uom/add', lang('Form.uom'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_uom', 'Write')) {
-            $uoms = new M_uoms();
-            $uoms->parseFromRequest();
-
-            try {
-                $uoms->validate();
-
-                $uoms->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('muom/add')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("muom/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_uom', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $uoms = new M_uoms();
+        $uoms->parseFromRequest();
+
+        try {
+            $uoms->validate();
+
+            $uoms->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('muom/add')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("muom/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_uom', 'Write')) {
-
-            $uoms = M_uoms::find($id);
-            $data['model'] = $uoms;
-            $this->loadView('m_uom/edit', lang('Form.uom'), $data);
+        $res = $this->hasPermission('m_uom', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $uoms = M_uoms::find($id);
+        $data['model'] = $uoms;
+        $this->loadView('m_uom/edit', lang('Form.uom'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_uom', 'Write')) {
-            $id = $this->request->getPost('Id');
-
-            $uoms = M_uoms::find($id);
-            $oldmodel = clone $uoms;
-
-            $uoms->parseFromRequest();
-
-            try {
-                $uoms->validate($oldmodel);
-
-
-                $uoms->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect('muom')->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("muom/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_uom', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $uoms = M_uoms::find($id);
+        $oldmodel = clone $uoms;
+
+        $uoms->parseFromRequest();
+
+        try {
+            $uoms->validate($oldmodel);
+
+
+            $uoms->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect('muom')->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("muom/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -96,7 +111,11 @@ class M_uom extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_uom', 'Delete')) {
+        $res = $this->hasPermission('m_uom', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
             $model = M_uoms::find($id);
             $result = $model->delete();
             if (!is_bool($result)) {
@@ -108,9 +127,7 @@ class M_uom extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
-        }
+        } 
     }
 
     public function getAllData()

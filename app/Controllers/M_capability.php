@@ -21,89 +21,106 @@ class M_capability extends Base_Controller
     public function index()
     {
         $res = $this->hasPermission('m_capability', 'Read');
-        if (is_bool($res)) {
-
-            $this->loadView('m_capability/index', lang('Form.capability'));
-        } else {
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
             return $res;
         }
+        
+    
+        $this->loadView('m_capability/index', lang('Form.capability'));
+       
     }
 
     public function add()
     {
-        if ($this->hasPermission('m_capability', 'Write')) {
-            $capabilities = new M_capabilities();
-            $data = setPageData_paging($capabilities);
-            $this->loadView('m_capability/add', lang('Form.capability'), $data);
+        $res = $this->hasPermission('m_capability', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $capabilities = new M_capabilities();
+        $data = setPageData_paging($capabilities);
+        $this->loadView('m_capability/add', lang('Form.capability'), $data);
+        
     }
 
     public function addsave()
     {
 
-        if ($this->hasPermission('m_capability', 'Write')) {
-
-            $capabilities = new M_capabilities();
-            $capabilities->parseFromRequest();
-
-            DbTrans::beginTransaction();
-            try {
-                $capabilities->validate();
-                $capabilities->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                DbTrans::commit();
-                return Redirect::redirect('mcapability/add')->go();
-                // }
-            } catch (EloquentException $e) {
-                DbTrans::rollback();
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect('mcapability/add')->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('m_capability', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $capabilities = new M_capabilities();
+        $capabilities->parseFromRequest();
+
+        DbTrans::beginTransaction();
+        try {
+            $capabilities->validate();
+            $capabilities->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            DbTrans::commit();
+            return Redirect::redirect('mcapability/add')->go();
+            // }
+        } catch (EloquentException $e) {
+            DbTrans::rollback();
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect('mcapability/add')->with($e->getEntity())->go();
+            }
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('m_capability', 'Write')) {
-
-            $capabilities = M_capabilities::find($id);
-            $data['model'] = $capabilities;
-            $this->loadView('m_capability/edit', lang('Form.capability'), $data);
+        $res = $this->hasPermission('m_capability', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $capabilities = M_capabilities::find($id);
+        $data['model'] = $capabilities;
+        $this->loadView('m_capability/edit', lang('Form.capability'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('m_capability', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $capabilities = M_capabilities::find($id);
-            $oldmodel = clone $capabilities;
-
-            $capabilities->parseFromRequest();
-
-            try {
-                $capabilities->validate($oldmodel);
-
-                $capabilities->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("mcapability")->go();
-                
-            } catch (EloquentException $e) {
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("mcapability/edit/$id")->with($capabilities)->go();
-            }
+        $res = $this->hasPermission('m_capability', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $capabilities = M_capabilities::find($id);
+        $oldmodel = clone $capabilities;
+
+        $capabilities->parseFromRequest();
+
+        try {
+            $capabilities->validate($oldmodel);
+
+            $capabilities->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("mcapability")->go();
+            
+        } catch (EloquentException $e) {
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("mcapability/edit/$id")->with($capabilities)->go();
+        }
+        
     }
 
 
     public function delete()
     {
-        $id = $this->request->getPost("id");
-        if ($this->hasPermission('m_capability', 'Delete')) {
+        $res = $this->hasPermission('m_capability', 'Delete');
 
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
+
+            $id = $this->request->getPost("id");
             $model = M_capabilities::find($id);
 
             $result = $model->delete();
