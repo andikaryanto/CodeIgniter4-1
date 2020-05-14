@@ -57,7 +57,7 @@ class M_villagedisaster extends Base_Controller
 
         try {
             $villagedisasters->validate();
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
             if ($fileCls->upload($file)) {
                 $villagedisasters->PhotoUrl = $fileCls->getFileUrl();
@@ -106,7 +106,7 @@ class M_villagedisaster extends Base_Controller
 
         try {
             $villagedisasters->validate($oldmodel);
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             if ($file['name']) {
                 $fileCls = new File("assets/upload/villagedisaster", ["jpg", "jpeg"]);
                 if ($fileCls->upload($file)) {

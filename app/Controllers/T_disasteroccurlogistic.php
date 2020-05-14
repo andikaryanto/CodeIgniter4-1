@@ -22,93 +22,103 @@ class T_disasteroccurlogistic extends Base_Controller
 
     public function index($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Read')) {
-            $result = T_disasteroccurs::find($iddisasteroccur);
-            $data['model'] = $result;
-
-            $this->loadView('t_disasteroccurlogistic/index', lang('Form.disasterlogistic'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+        $data['model'] = $result;
+
+        $this->loadView('t_disasteroccurlogistic/index', lang('Form.disasterlogistic'), $data);
+    
     }
 
     public function add($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $result = T_disasteroccurs::find($iddisasteroccur);
-
-            $disasteroccurlogistics = new T_disasteroccurlogistics();
-
-            $data = setPageData_paging($disasteroccurlogistics);
-
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurlogistic/add', lang('Form.disasterlogistic'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+
+        $disasteroccurlogistics = new T_disasteroccurlogistics();
+
+        $data = setPageData_paging($disasteroccurlogistics);
+
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurlogistic/add', lang('Form.disasterlogistic'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $disasteroccurlogistics = new T_disasteroccurlogistics();
-            $disasteroccurlogistics->parseFromRequest();
-
-            $result = T_disasteroccurs::find($disasteroccurlogistics->T_Disasteroccur_Id);
-
-            try {
-                $disasteroccurlogistics->validate();
-
-                $disasteroccurlogistics->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurlogistic/add/{$disasteroccurlogistics->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurlogistic/add/{$disasteroccurlogistics->T_Disasteroccur_Id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasteroccurlogistics = new T_disasteroccurlogistics();
+        $disasteroccurlogistics->parseFromRequest();
+
+        $result = T_disasteroccurs::find($disasteroccurlogistics->T_Disasteroccur_Id);
+
+        try {
+            $disasteroccurlogistics->validate();
+
+            $disasteroccurlogistics->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurlogistic/add/{$disasteroccurlogistics->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurlogistic/add/{$disasteroccurlogistics->T_Disasteroccur_Id}")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            $disasteroccurlogistics = T_disasteroccurlogistics::find($id);
-
-            $result = T_disasteroccurs::find($disasteroccurlogistics->T_Disasteroccur_Id);
-            // echo json_encode($disasteroccurlogistics);
-
-            $data['model'] = $disasteroccurlogistics;
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurlogistic/edit', lang('Form.disasterlogistic'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasteroccurlogistics = T_disasteroccurlogistics::find($id);
+
+        $result = T_disasteroccurs::find($disasteroccurlogistics->T_Disasteroccur_Id);
+        // echo json_encode($disasteroccurlogistics);
+
+        $data['model'] = $disasteroccurlogistics;
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurlogistic/edit', lang('Form.disasterlogistic'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasteroccurlogistics = T_disasteroccurlogistics::find($id);
-            $oldmodel = clone $disasteroccurlogistics;
-
-            $disasteroccurlogistics->parseFromRequest();
-
-            try {
-                $disasteroccurlogistics->validate($oldmodel);
-
-                $disasteroccurlogistics->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurlogistic/{$disasteroccurlogistics->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurlogistic/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $disasteroccurlogistics = T_disasteroccurlogistics::find($id);
+        $oldmodel = clone $disasteroccurlogistics;
+
+        $disasteroccurlogistics->parseFromRequest();
+
+        try {
+            $disasteroccurlogistics->validate($oldmodel);
+
+            $disasteroccurlogistics->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurlogistic/{$disasteroccurlogistics->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurlogistic/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -116,7 +126,11 @@ class T_disasteroccurlogistic extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasteroccur', 'Delete')) {
+        $res = $this->hasPermission('t_disasteroccur', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasteroccurlogistics::find($id);
             $result = $model->delete();
@@ -129,8 +143,6 @@ class T_disasteroccurlogistic extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

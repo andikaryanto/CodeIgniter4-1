@@ -54,7 +54,7 @@ class M_infrastructurecategory extends Base_Controller
 
         try {
             $infrastructurecategories->validate();
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {
@@ -100,7 +100,7 @@ class M_infrastructurecategory extends Base_Controller
 
         try {
             $infrastructurecategories->validate($oldmodel);
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/infrastructurecategory/icon", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {

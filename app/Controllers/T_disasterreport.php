@@ -22,19 +22,25 @@ class T_disasterreport extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('t_disasterreport', 'Read')) {
-
-            $this->loadView('t_disasterreport/index', lang('Form.disasterreport'));
+        $res = $this->hasPermission('t_disasterreport', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $this->loadView('t_disasterreport/index', lang('Form.disasterreport'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('t_disasterreport', 'Write')) {
-            $disasterreports = new T_disasterreports();
-            $data = setPageData_paging($disasterreports);
-            $this->loadView('t_disasterreport/add', lang('Form.disasterreport'), $data);
+        $res = $this->hasPermission('t_disasterreport', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasterreports = new T_disasterreports();
+        $data = setPageData_paging($disasterreports);
+        $this->loadView('t_disasterreport/add', lang('Form.disasterreport'), $data);
+        
     }
 
     public function addpublic()
@@ -60,14 +66,14 @@ class T_disasterreport extends Base_Controller
             $videourl = null;
             $result = true;
             $resultvideo = true;
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             if ($file['name']) {
                 $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);
                 $photourl = $photo->getFileUrl();
             }
 
-            $filevideo = $this->request->getFileMultiple('video');
+            $filevideo = $this->request->getFile('video');
             if ($filevideo['name']) {
                 $video = new File("assets/upload/disasterreport/video");
                 $resultvideo = $video->upload($filevideo);
@@ -100,132 +106,140 @@ class T_disasterreport extends Base_Controller
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasterreport', 'Write')) {
-            $disasterreports = new T_disasterreports();
-            $disasterreports->parseFromRequest();
-            try {
-                $disasterreports->validate();
-
-
-                $video = null;
-                $photo = null;
-                $photourl = null;
-                $videourl = null;
-                $result = true;
-                $resultvideo = true;
-                $file = $this->request->getFileMultiple('photo');
-                if ($file['name']) {
-                    $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
-                    $result = $photo->upload($file);
-                    $photourl = $photo->getFileUrl();
-                }
-
-                $filevideo = $this->request->getFileMultiple('video');
-                if ($filevideo['name']) {
-                    $video = new File("assets/upload/disasterreport/video");
-                    $resultvideo = $video->upload($filevideo);
-                    $videourl = $video->getFileUrl();
-                }
-
-                if ($resultvideo && $result) {
-                    $formid = M_forms::findDataByName('t_disasterreports')->Id;
-                    $disasterreports->Photo = $photourl;
-                    $disasterreports->Video = $videourl;
-                    $disasterreports->ReportNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
-                    $disasterreports->save();
-                    G_transactionnumbers::updateLastNumber($formid, date('Y'), date("m"));
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tdisasterreport/add')->go();
-                } else {
-                    if($photo)
-                        Session::setFlash('add_warning_msg', array(0 => $photo->getErrorMessage()));
-                    if($video)
-                        Session::setFlash('add_warning_msg', array(0 => $video->getErrorMessage()));
-                    return Redirect::redirect('tdisasterreport/add')->with($disasterreports)->go();
-                }
-            } catch (EloquentException $e) {
-
-                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasterreport/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasterreport', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasterreports = new T_disasterreports();
+        $disasterreports->parseFromRequest();
+        try {
+            $disasterreports->validate();
+
+
+            $video = null;
+            $photo = null;
+            $photourl = null;
+            $videourl = null;
+            $result = true;
+            $resultvideo = true;
+            $file = $this->request->getFile('photo');
+            if ($file['name']) {
+                $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
+                $result = $photo->upload($file);
+                $photourl = $photo->getFileUrl();
+            }
+
+            $filevideo = $this->request->getFile('video');
+            if ($filevideo['name']) {
+                $video = new File("assets/upload/disasterreport/video");
+                $resultvideo = $video->upload($filevideo);
+                $videourl = $video->getFileUrl();
+            }
+
+            if ($resultvideo && $result) {
+                $formid = M_forms::findDataByName('t_disasterreports')->Id;
+                $disasterreports->Photo = $photourl;
+                $disasterreports->Video = $videourl;
+                $disasterreports->ReportNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
+                $disasterreports->save();
+                G_transactionnumbers::updateLastNumber($formid, date('Y'), date("m"));
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tdisasterreport/add')->go();
+            } else {
+                if($photo)
+                    Session::setFlash('add_warning_msg', array(0 => $photo->getErrorMessage()));
+                if($video)
+                    Session::setFlash('add_warning_msg', array(0 => $video->getErrorMessage()));
+                return Redirect::redirect('tdisasterreport/add')->with($disasterreports)->go();
+            }
+        } catch (EloquentException $e) {
+
+            $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasterreport/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_disasterreport', 'Write')) {
-
-            $disasterreports = T_disasterreports::find($id);
-            $disasterreports->DateOccur = get_formated_date($disasterreports->DateOccur, "d-m-Y H:i");
-            $data['model'] = $disasterreports;
-            $this->loadView('t_disasterreport/edit', lang('Form.disasterreport'), $data);
+        $res = $this->hasPermission('t_disasterreport', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasterreports = T_disasterreports::find($id);
+        $disasterreports->DateOccur = get_formated_date($disasterreports->DateOccur, "d-m-Y H:i");
+        $data['model'] = $disasterreports;
+        $this->loadView('t_disasterreport/edit', lang('Form.disasterreport'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('t_disasterreport', 'Write')) {
-
-            $id = $this->request->getGetPost('Id');
-
-            $disasterreports = T_disasterreports::find($id);
-            $oldmodel = clone $disasterreports;
-
-            $disasterreports->parseFromRequest();
-
-            try {
-                $disasterreports->validate($oldmodel);
-
-                $video = null;
-                $photo = null;
-                $photourl = null;
-                $videourl = null;
-                $result = true;
-                $resultvideo = true;
-                $file = $this->request->getFileMultiple('photo');
-                if ($file['name']) {
-                    $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
-                    $result = $photo->upload($file);
-                    $photourl = $photo->getFileUrl();
-                }
-
-                $filevideo = $this->request->getFileMultiple('video');
-                if ($filevideo['name']) {
-                    $video = new File("assets/upload/disasterreport/video");
-                    $resultvideo = $video->upload($filevideo);
-                    $videourl = $video->getFileUrl();
-                }
-                if ($resultvideo && $result) {
-                    if($photourl && $disasterreports->Photo){
-                        unlink($disasterreports->Photo);
-                        $disasterreports->Photo = $photourl;
-                    }
-                    
-                    if($videourl && $disasterreports->Photo){
-                        unlink($disasterreports->Photo);
-                        $disasterreports->Video = $videourl;
-                    }
-
-                    $disasterreports->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tdisasterreport/add')->go();
-                } else {
-                    if($photo)
-                        Session::setFlash('add_warning_msg', array(0 => $photo->getErrorMessage()));
-                    if($video)
-                        Session::setFlash('add_warning_msg', array(0 => $video->getErrorMessage()));
-                        
-                    return Redirect::redirect('tdisasterreport/add')->with($disasterreports)->go();
-                }
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasterreport/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasterreport', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getGetPost('Id');
+
+        $disasterreports = T_disasterreports::find($id);
+        $oldmodel = clone $disasterreports;
+
+        $disasterreports->parseFromRequest();
+
+        try {
+            $disasterreports->validate($oldmodel);
+
+            $video = null;
+            $photo = null;
+            $photourl = null;
+            $videourl = null;
+            $result = true;
+            $resultvideo = true;
+            $file = $this->request->getFile('photo');
+            if ($file['name']) {
+                $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
+                $result = $photo->upload($file);
+                $photourl = $photo->getFileUrl();
+            }
+
+            $filevideo = $this->request->getFile('video');
+            if ($filevideo['name']) {
+                $video = new File("assets/upload/disasterreport/video");
+                $resultvideo = $video->upload($filevideo);
+                $videourl = $video->getFileUrl();
+            }
+            if ($resultvideo && $result) {
+                if($photourl && $disasterreports->Photo){
+                    unlink($disasterreports->Photo);
+                    $disasterreports->Photo = $photourl;
+                }
+                
+                if($videourl && $disasterreports->Photo){
+                    unlink($disasterreports->Photo);
+                    $disasterreports->Video = $videourl;
+                }
+
+                $disasterreports->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tdisasterreport/add')->go();
+            } else {
+                if($photo)
+                    Session::setFlash('add_warning_msg', array(0 => $photo->getErrorMessage()));
+                if($video)
+                    Session::setFlash('add_warning_msg', array(0 => $video->getErrorMessage()));
+                    
+                return Redirect::redirect('tdisasterreport/add')->with($disasterreports)->go();
+            }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasterreport/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -233,7 +247,11 @@ class T_disasterreport extends Base_Controller
     {
 
         $id = $this->request->getGetPost("id");
-        if ($this->hasPermission('t_disasterreport', 'Delete')) {
+        $res = $this->hasPermission('t_disasterreport', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasterreports::find($id);
 

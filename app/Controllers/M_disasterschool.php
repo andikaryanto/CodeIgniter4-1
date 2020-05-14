@@ -58,7 +58,7 @@ class M_disasterschool extends Base_Controller
         try {
             $disasterschools->validate();
 
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
             if ($fileCls->upload($file)) {
                 $disasterschools->PhotoUrl = $fileCls->getFileUrl();
@@ -111,10 +111,10 @@ class M_disasterschool extends Base_Controller
             $disasterschools->validate($oldmodel);
 
 
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             // echo json_encode($file);
             if ($file['name']) {
-                // echo json_encode($this->request->getFileMultiple('photo'));
+                // echo json_encode($this->request->getFile('photo'));
                 $fileCls = new File("assets/upload/disasterschool", ["jpg", "jpeg"]);
                 if ($fileCls->upload($file)) {
 

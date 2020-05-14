@@ -23,139 +23,148 @@ class T_disasteroccurvictim extends Base_Controller
 
     public function index($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Read')) {
-            $result = T_disasteroccurs::find($iddisasteroccur);
-            $data['model'] = $result;
-
-            $this->loadView('t_disasteroccurvictim/index', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+        $data['model'] = $result;
+
+        $this->loadView('t_disasteroccurvictim/index', lang('Form.disasterimpact'), $data);
+    
     }
 
     public function add($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $result = T_disasteroccurs::find($iddisasteroccur);
-
-            if($result->Status == T_disasteroccursStatus::DONE){
-                $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa ditambah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
-            } 
-            $disasteroccurvictims = new T_disasteroccurvictims();
-
-            $data = setPageData_paging($disasteroccurvictims);
-
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurvictim/add', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa ditambah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
+        } 
+        $disasteroccurvictims = new T_disasteroccurvictims();
+
+        $data = setPageData_paging($disasteroccurvictims);
+
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurvictim/add', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function addsave()
     {
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
+        $usefamilycard = $this->request->getPost("usefamilycard");
 
-            $usefamilycard = $this->request->getPost("usefamilycard");
+        $disasteroccurvictims = new T_disasteroccurvictims();
+        
+        $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa ditambah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
+        } 
 
-            $disasteroccurvictims = new T_disasteroccurvictims();
-            
-            $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
-            if($result->Status == T_disasteroccursStatus::DONE){
-                $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa ditambah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
-            } 
+        $disasteroccurvictims->parseFromRequest();
+        try {
+            if ($usefamilycard) {
+                $familycard = M_familycards::find($disasteroccurvictims->M_Familycard_Id);
+                if ($familycard) {
+                    foreach ($familycard->get_list_M_Familycardmember() as $detail) {
+                        $newdetail = new T_disasteroccurvictims();
+                        $newdetail->M_Familycard_Id = $disasteroccurvictims->M_Familycard_Id;
+                        $newdetail->M_Familycardmember_Id = $detail->Id;
+                        $newdetail->T_Disasteroccur_Id = $disasteroccurvictims->T_Disasteroccur_Id;
+                        $newdetail->Name = $detail->CompleteName;
+                        $newdetail->NIK = $detail->NIK;
+                        $newdetail->Gender = $detail->Gender;
+                        $newdetail->BirthPlace = $detail->BirthPlace;
+                        $newdetail->BirthDate = $detail->BirthDate;
+                        $newdetail->Relgion = $detail->Relgion;
+                        $newdetail->save();
+                    }
 
-            $disasteroccurvictims->parseFromRequest();
-            try {
-                if ($usefamilycard) {
-                    $familycard = M_familycards::find($disasteroccurvictims->M_Familycard_Id);
-                    if ($familycard) {
-                        foreach ($familycard->get_list_M_Familycardmember() as $detail) {
-                            $newdetail = new T_disasteroccurvictims();
-                            $newdetail->M_Familycard_Id = $disasteroccurvictims->M_Familycard_Id;
-                            $newdetail->M_Familycardmember_Id = $detail->Id;
-                            $newdetail->T_Disasteroccur_Id = $disasteroccurvictims->T_Disasteroccur_Id;
-                            $newdetail->Name = $detail->CompleteName;
-                            $newdetail->NIK = $detail->NIK;
-                            $newdetail->Gender = $detail->Gender;
-                            $newdetail->BirthPlace = $detail->BirthPlace;
-                            $newdetail->BirthDate = $detail->BirthDate;
-                            $newdetail->Relgion = $detail->Relgion;
-                            $newdetail->save();
-                        }
-
-                        Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                        return Redirect::redirect("tdisasteroccurvictim/add/{$disasteroccurvictims->T_Disasteroccur_Id}")->go();
-                    } else { }
-                } else {
-                    $disasteroccurvictims->validate();
-
-                    $disasteroccurvictims->save();
                     Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                     return Redirect::redirect("tdisasteroccurvictim/add/{$disasteroccurvictims->T_Disasteroccur_Id}")->go();
-                }
-            } catch (EloquentException $e) {
+                } else { }
+            } else {
+                $disasteroccurvictims->validate();
 
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurvictim/add/{$disasteroccurvictims->T_Disasteroccur_Id}")->with($e->getEntity())->go();
+                $disasteroccurvictims->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect("tdisasteroccurvictim/add/{$disasteroccurvictims->T_Disasteroccur_Id}")->go();
             }
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurvictim/add/{$disasteroccurvictims->T_Disasteroccur_Id}")->with($e->getEntity())->go();
         }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            $disasteroccurvictims = T_disasteroccurvictims::find($id);
-
-            $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
-            if($result->Status == T_disasteroccursStatus::DONE){
-                $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
-            } 
-            // echo json_encode($disasteroccurvictims);
-
-            $data['model'] = $disasteroccurvictims;
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurvictim/edit', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasteroccurvictims = T_disasteroccurvictims::find($id);
+
+        $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
+        } 
+        // echo json_encode($disasteroccurvictims);
+
+        $data['model'] = $disasteroccurvictims;
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurvictim/edit', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasteroccurvictims = T_disasteroccurvictims::find($id);
-
-            $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
-            if($result->Status == T_disasteroccursStatus::DONE){
-                $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
-            } 
-            
-            $oldmodel = clone $disasteroccurvictims;
-
-            $disasteroccurvictims->parseFromRequest();
-
-            try {
-                $disasteroccurvictims->validate($oldmodel);
-                $disasteroccurvictims->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurvictim/{$disasteroccurvictims->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurvictim/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $disasteroccurvictims = T_disasteroccurvictims::find($id);
+
+        $result = T_disasteroccurs::find($disasteroccurvictims->T_Disasteroccur_Id);
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurvictim/{$result->Id}")->go();
+        } 
+        
+        $oldmodel = clone $disasteroccurvictims;
+
+        $disasteroccurvictims->parseFromRequest();
+
+        try {
+            $disasteroccurvictims->validate($oldmodel);
+            $disasteroccurvictims->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurvictim/{$disasteroccurvictims->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurvictim/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -163,7 +172,11 @@ class T_disasteroccurvictim extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasteroccur', 'Delete')) {
+        $res = $this->hasPermission('t_disasteroccur', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasteroccurvictims::find($id);
             $result = $model->delete();
@@ -176,8 +189,6 @@ class T_disasteroccurvictim extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

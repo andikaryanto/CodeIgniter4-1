@@ -25,189 +25,199 @@ class T_disasteroccur extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('t_disasteroccur', 'Read')) {
-
-            $this->loadView('t_disasteroccur/index', lang('Form.disasteroccur'));
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('t_disasteroccur/index', lang('Form.disasteroccur'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-            $ref = $this->request->getGet("Ref");
-
-            $disasteroccurs = new T_disasteroccurs();
-            if ($ref) {
-
-                $report  = T_disasterreports::find($ref);
-                $p = [
-                    'where' => [
-                        'T_Disasterreport_Id' => $ref
-                    ]
-                ];
-                $ass = T_disasterassessments::findOne($p);
-                if($ass)
-                    $disasteroccurs->copyFromAssessment($ass);
-                else 
-                    $disasteroccurs->copyFromReport($report);
-                $disasteroccurs->DateOccur = get_formated_date($disasteroccurs->DateOccur, 'd-m-Y H:i');
-                // echo json_encode($disasteroccurs);
-            }
-
-            $data = setPageData_paging($disasteroccurs);
-            $this->loadView('t_disasteroccur/add', lang('Form.disasteroccur'), $data);
+        
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $ref = $this->request->getGet("Ref");
+
+        $disasteroccurs = new T_disasteroccurs();
+        if ($ref) {
+
+            $report  = T_disasterreports::find($ref);
+            $p = [
+                'where' => [
+                    'T_Disasterreport_Id' => $ref
+                ]
+            ];
+            $ass = T_disasterassessments::findOne($p);
+            if($ass)
+                $disasteroccurs->copyFromAssessment($ass);
+            else 
+                $disasteroccurs->copyFromReport($report);
+            $disasteroccurs->DateOccur = get_formated_date($disasteroccurs->DateOccur, 'd-m-Y H:i');
+            // echo json_encode($disasteroccurs);
+        }
+
+        $data = setPageData_paging($disasteroccurs);
+        $this->loadView('t_disasteroccur/add', lang('Form.disasteroccur'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $disasteroccurs = new T_disasteroccurs();
-            $disasteroccurs->parseFromRequest();
-            try {
-                $disasteroccurs->validate();
-
-                $video = null;
-                $photo = null;
-                $photourl = null;
-                $videourl = null;
-                $result = true;
-                $resultvideo = true;
-                $file = $this->request->getFileMultiple('photo');
-                $filevideo = $this->request->getFileMultiple('video');
-                if (empty($disasteroccurs->T_Disasterreport_Id)) {
-                    if ($file['name']) {
-                        $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
-                        $result = $photo->upload($file);
-                        $photourl = $photo->getFileUrl();
-                    }
-
-                    if ($filevideo['name']) {
-                        $video = new File("assets/upload/disasteroccur/video");
-                        $resultvideo = $video->upload($filevideo);
-                        $videourl = $video->getFileUrl();
-                    }
-                } else {
-                    $report = T_disasterreports::find($disasteroccurs->T_Disasterreport_Id);
-                    $photourl = $report->Photo;
-                    $videourl = $report->Video;
-
-                    if ($file['name']) {
-                        $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
-                        $result = $photo->upload($file);
-                        $photourl = $photo->getFileUrl();
-                    }
-
-                    if ($filevideo['name']) {
-                        $video = new File("assets/upload/disasteroccur/video");
-                        $resultvideo = $video->upload($filevideo);
-                        $videourl = $video->getFileUrl();
-                    }
-                }
-
-                if ($resultvideo && $result) {
-                    $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
-                    $disasteroccurs->Photo = $photourl;
-                    $disasteroccurs->Video = $videourl;
-                    $disasteroccurs->TransNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
-                    $disasteroccurs->save();
-                    G_transactionnumbers::updateLastNumber($formid, date('Y'), date("m"));
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tdisasteroccur/add')->go();
-                } else {
-                    if ($photo)
-                        throw new EloquentException($photo->getErrorMessage(), $disasteroccurs);
-                    if ($video)
-                        throw new EloquentException($video->getErrorMessage(), $disasteroccurs);
-                }
-            } catch (EloquentException $e) {
-                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccur/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
-    }
+        $disasteroccurs = new T_disasteroccurs();
+        $disasteroccurs->parseFromRequest();
+        try {
+            $disasteroccurs->validate();
 
-    public function edit($id)
-    {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $disasteroccurs = T_disasteroccurs::find($id);
-            $disasteroccurs->DateOccur = get_formated_date($disasteroccurs->DateOccur, "d-m-Y H:i");
-            $data['model'] = $disasteroccurs;
-            $this->loadView('t_disasteroccur/edit', lang('Form.disasteroccur'), $data);
-        }
-    }
-
-    public function editsave()
-    {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasteroccurs = T_disasteroccurs::find($id);
-            $oldmodel = clone $disasteroccurs;
-
-            $disasteroccurs->parseFromRequest();
-            // echo json_encode($disasteroccurs);
-
-            try {
-                $disasteroccurs->validate($oldmodel);
-
-                $photo = null;
-                $video = null;
-                $photourl = null;
-                $videourl = null;
-                $result = true;
-                $resultvideo = true;
-                $file = $this->request->getFileMultiple('photo');
-                $filevideo = $this->request->getFileMultiple('video');
-
-                $report = false;
-                if ($disasteroccurs->T_Disasterreport_Id)
-                    $report = T_disasterreports::find($disasteroccurs->T_Disasterreport_Id);
-
+            $video = null;
+            $photo = null;
+            $photourl = null;
+            $videourl = null;
+            $result = true;
+            $resultvideo = true;
+            $file = $this->request->getFile('photo');
+            $filevideo = $this->request->getFile('video');
+            if (empty($disasteroccurs->T_Disasterreport_Id)) {
                 if ($file['name']) {
                     $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
                     $result = $photo->upload($file);
-                    unlink(FCPATH . $disasteroccurs->Photo);
                     $photourl = $photo->getFileUrl();
-                } else {
-                    $photourl = $disasteroccurs->Photo;
                 }
 
                 if ($filevideo['name']) {
                     $video = new File("assets/upload/disasteroccur/video");
                     $resultvideo = $video->upload($filevideo);
-                    unlink(FCPATH . $disasteroccurs->Video);
                     $videourl = $video->getFileUrl();
-                } else {
-                    $videourl = $disasteroccurs->Video;
+                }
+            } else {
+                $report = T_disasterreports::find($disasteroccurs->T_Disasterreport_Id);
+                $photourl = $report->Photo;
+                $videourl = $report->Video;
+
+                if ($file['name']) {
+                    $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
+                    $result = $photo->upload($file);
+                    $photourl = $photo->getFileUrl();
                 }
 
-                if ($resultvideo && $result) {
-                    $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
-                    $disasteroccurs->Photo = $photourl;
-                    $disasteroccurs->Video = $videourl;
-                    $disasteroccurs->save();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tdisasteroccur')->go();
-                } else {
-                    if ($photo)
-                        throw new EloquentException($photo->getErrorMessage(), $disasteroccurs);
-                    if ($video)
-                        throw new EloquentException($video->getErrorMessage(), $disasteroccurs);
+                if ($filevideo['name']) {
+                    $video = new File("assets/upload/disasteroccur/video");
+                    $resultvideo = $video->upload($filevideo);
+                    $videourl = $video->getFileUrl();
                 }
-            } catch (EloquentException $e) {
-
-                $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccur/edit/{$id}")->with($e->getEntity())->go();
             }
+
+            if ($resultvideo && $result) {
+                $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
+                $disasteroccurs->Photo = $photourl;
+                $disasteroccurs->Video = $videourl;
+                $disasteroccurs->TransNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
+                $disasteroccurs->save();
+                G_transactionnumbers::updateLastNumber($formid, date('Y'), date("m"));
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tdisasteroccur/add')->go();
+            } else {
+                if ($photo)
+                    throw new EloquentException($photo->getErrorMessage(), $disasteroccurs);
+                if ($video)
+                    throw new EloquentException($video->getErrorMessage(), $disasteroccurs);
+            }
+        } catch (EloquentException $e) {
+            $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccur/add")->with($e->getEntity())->go();
         }
+        
+    }
+
+    public function edit($id)
+    {
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $disasteroccurs = T_disasteroccurs::find($id);
+        $disasteroccurs->DateOccur = get_formated_date($disasteroccurs->DateOccur, "d-m-Y H:i");
+        $data['model'] = $disasteroccurs;
+        $this->loadView('t_disasteroccur/edit', lang('Form.disasteroccur'), $data);
+        
+    }
+
+    public function editsave()
+    {
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $id = $this->request->getPost('Id');
+
+        $disasteroccurs = T_disasteroccurs::find($id);
+        $oldmodel = clone $disasteroccurs;
+
+        $disasteroccurs->parseFromRequest();
+        // echo json_encode($disasteroccurs);
+
+        try {
+            $disasteroccurs->validate($oldmodel);
+
+            $photo = null;
+            $video = null;
+            $photourl = null;
+            $videourl = null;
+            $result = true;
+            $resultvideo = true;
+            $file = $this->request->getFile('photo');
+            $filevideo = $this->request->getFile('video');
+
+            $report = false;
+            if ($disasteroccurs->T_Disasterreport_Id)
+                $report = T_disasterreports::find($disasteroccurs->T_Disasterreport_Id);
+
+            if ($file['name']) {
+                $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
+                $result = $photo->upload($file);
+                unlink(FCPATH . $disasteroccurs->Photo);
+                $photourl = $photo->getFileUrl();
+            } else {
+                $photourl = $disasteroccurs->Photo;
+            }
+
+            if ($filevideo['name']) {
+                $video = new File("assets/upload/disasteroccur/video");
+                $resultvideo = $video->upload($filevideo);
+                unlink(FCPATH . $disasteroccurs->Video);
+                $videourl = $video->getFileUrl();
+            } else {
+                $videourl = $disasteroccurs->Video;
+            }
+
+            if ($resultvideo && $result) {
+                $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
+                $disasteroccurs->Photo = $photourl;
+                $disasteroccurs->Video = $videourl;
+                $disasteroccurs->save();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tdisasteroccur')->go();
+            } else {
+                if ($photo)
+                    throw new EloquentException($photo->getErrorMessage(), $disasteroccurs);
+                if ($video)
+                    throw new EloquentException($video->getErrorMessage(), $disasteroccurs);
+            }
+        } catch (EloquentException $e) {
+
+            $e->getEntity()->DateOccur = get_formated_date($e->getEntity()->DateOccur, 'd-m-Y H:i');
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccur/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -215,7 +225,11 @@ class T_disasteroccur extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasteroccur', 'Delete')) {
+        $res = $this->hasPermission('t_disasteroccur', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasteroccurs::find($id);
 

@@ -80,7 +80,7 @@ class M_infrastructure extends Base_Controller
         try {
             $infrastructures->validate();
 
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             $fileCls = new File("assets/upload/infrastructure", ["jpg", "jpeg"]);
             if ($fileCls->upload($file)) {
                 $infrastructures->PhotoUrl = $fileCls->getFileUrl();
@@ -133,7 +133,7 @@ class M_infrastructure extends Base_Controller
             return Redirect::redirect("minfrastructure/edit/{$id}")->with($infrastructures)->go();
         } else {
 
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             // echo json_encode($file);
             if ($file['name']) {
                 // echo json_encode($this->request->getFiles('photo'));

@@ -54,7 +54,7 @@ class M_pocketbook extends Base_Controller
         $pocketbooks->parseFromRequest();
         try {
             $pocketbooks->validate();
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/pocketbook", ["pdf"]);
             $result = $photo->upload($file);
             if ($result) {
@@ -102,7 +102,7 @@ class M_pocketbook extends Base_Controller
 
         try {
             $pocketbooks->validate($oldmodel);
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/pocketbook", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {

@@ -21,91 +21,101 @@ class T_disasterassessmentimpact extends Base_Controller
 
     public function index($iddisasterassessment)
     {
-        if ($this->hasPermission('t_disasterassessment', 'Read')) {
-            $result = T_disasterassessments::find($iddisasterassessment);
-            $data['model'] = $result;
-
-            $this->loadView('t_disasterassessmentimpact/index', lang('Form.disasterimpact'), $data);
+        
+        $res = $this->hasPermission('t_disasterassessment', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        
+        $result = T_disasterassessments::find($iddisasterassessment);
+        $data['model'] = $result;
+
+        $this->loadView('t_disasterassessmentimpact/index', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function add($iddisasterassessment)
     {
-        if ($this->hasPermission('t_disasterassessment', 'Write')) {
-
-            $result = T_disasterassessments::find($iddisasterassessment);
-
-            $disasterassessmentimpacts = new T_disasterassessmentimpacts();
-
-            $data = setPageData_paging($disasterassessmentimpacts);
-
-            $data['disasterassessment'] = $result;
-            $this->loadView('t_disasterassessmentimpact/add', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasterassessment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $result = T_disasterassessments::find($iddisasterassessment);
+
+        $disasterassessmentimpacts = new T_disasterassessmentimpacts();
+
+        $data = setPageData_paging($disasterassessmentimpacts);
+
+        $data['disasterassessment'] = $result;
+        $this->loadView('t_disasterassessmentimpact/add', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasterassessment', 'Write')) {
-
-
-            $disasterassessmentimpacts = new T_disasterassessmentimpacts();
-            $disasterassessmentimpacts->parseFromRequest();
-
-            try {
-                $disasterassessmentimpacts->validate();
-
-                $disasterassessmentimpacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasterassessment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $disasterassessmentimpacts = new T_disasterassessmentimpacts();
+        $disasterassessmentimpacts->parseFromRequest();
+
+        try {
+            $disasterassessmentimpacts->validate();
+
+            $disasterassessmentimpacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasterassessmentimpact/add/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_disasterassessment', 'Write')) {
-
-
-
-            $disasterassessmentimpacts = T_disasterassessmentimpacts::find($id);
-
-            $result = T_disasterassessments::find($disasterassessmentimpacts->T_Disasterassessment_Id);
-
-            $data['model'] = $disasterassessmentimpacts;
-            $data['disasterassessment'] = $result;
-            $this->loadView('t_disasterassessmentimpact/edit', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasterassessment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasterassessmentimpacts = T_disasterassessmentimpacts::find($id);
+
+        $result = T_disasterassessments::find($disasterassessmentimpacts->T_Disasterassessment_Id);
+
+        $data['model'] = $disasterassessmentimpacts;
+        $data['disasterassessment'] = $result;
+        $this->loadView('t_disasterassessmentimpact/edit', lang('Form.disasterimpact'), $data);
+    
     }
 
     public function editsave()
     {
+        $res = $this->hasPermission('t_disasterassessment', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
 
-        if ($this->hasPermission('t_disasterassessment', 'Write')) {
+        $id = $this->request->getPost('Id');
 
-            $id = $this->request->getPost('Id');
+        $disasterassessmentimpacts = T_disasterassessmentimpacts::find($id);
+        $oldmodel = clone $disasterassessmentimpacts;
 
-            $disasterassessmentimpacts = T_disasterassessmentimpacts::find($id);
-            $oldmodel = clone $disasterassessmentimpacts;
+        $disasterassessmentimpacts->parseFromRequest();
 
-            $disasterassessmentimpacts->parseFromRequest();
+        try {
+            $disasterassessmentimpacts->validate($oldmodel);
 
-            try {
-                $disasterassessmentimpacts->validate($oldmodel);
+            $disasterassessmentimpacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasterassessmentimpact/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
+        } catch (EloquentException $e) {
 
-                $disasterassessmentimpacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasterassessmentimpact/{$disasterassessmentimpacts->T_Disasterassessment_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasterassessmentimpact/edit/{$id}")->with($e->getEntity())->go();
-            }
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasterassessmentimpact/edit/{$id}")->with($e->getEntity())->go();
         }
     }
 
@@ -114,7 +124,11 @@ class T_disasterassessmentimpact extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasterassessment', 'Delete')) {
+        $res = $this->hasPermission('t_disasterassessment', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasterassessmentimpacts::find($id);
             $result = $model->delete();
@@ -127,8 +141,6 @@ class T_disasterassessmentimpact extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

@@ -54,12 +54,12 @@ class M_disaster extends Base_Controller
         $disasters = new M_disasters();
         $disasters->parseFromRequest();
         try {
-            $disasters->validate();
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {
                 $disasters->Icon = $photo->getFileUrl();
+                $disasters->validate();
                 $disasters->save();
                 Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
                 return Redirect::redirect('mdisaster/add')->go();
@@ -104,7 +104,7 @@ class M_disaster extends Base_Controller
 
         try {
             $disasters->validate($oldmodel);
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/disaster/icon", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {

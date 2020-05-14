@@ -50,8 +50,14 @@ class Base_Controller extends Controller
 		// E.g.:
 		// $this->session = \Config\Services::session();
         $this->db = \Config\Database::connect();
+        $this->negotiator = \Config\Services::negotiator();
         $this->request = $request;
-        
+        $supported = [
+            // $_SESSION['kospinlanguages']['Locale']
+            'id'
+        ];
+
+        $lang = $this->negotiator->language($supported);
 
 	}
 

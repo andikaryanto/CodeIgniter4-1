@@ -21,91 +21,98 @@ class T_disasteroccurimpact extends Base_Controller
 
     public function index($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Read')) {
-            $result = T_disasteroccurs::find($iddisasteroccur);
-            $data['model'] = $result;
-
-            $this->loadView('t_disasteroccurimpact/index', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+        $data['model'] = $result;
+
+        $this->loadView('t_disasteroccurimpact/index', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function add($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $result = T_disasteroccurs::find($iddisasteroccur);
-
-            $disasteroccurimpacts = new T_disasteroccurimpacts();
-
-            $data = setPageData_paging($disasteroccurimpacts);
-
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurimpact/add', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+
+        $disasteroccurimpacts = new T_disasteroccurimpacts();
+
+        $data = setPageData_paging($disasteroccurimpacts);
+
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurimpact/add', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            $disasteroccurimpacts = new T_disasteroccurimpacts();
-            $disasteroccurimpacts->parseFromRequest();
-
-            try {
-                $disasteroccurimpacts->validate();
-
-                $disasteroccurimpacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasteroccurimpacts = new T_disasteroccurimpacts();
+        $disasteroccurimpacts->parseFromRequest();
+
+        try {
+            $disasteroccurimpacts->validate();
+
+            $disasteroccurimpacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurimpact/add/{$disasteroccurimpacts->T_Disasteroccur_Id}")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            $disasteroccurimpacts = T_disasteroccurimpacts::find($id);
-
-            $result = T_disasteroccurs::find($disasteroccurimpacts->T_Disasteroccur_Id);
-
-            $data['model'] = $disasteroccurimpacts;
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurimpact/edit', lang('Form.disasterimpact'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $disasteroccurimpacts = T_disasteroccurimpacts::find($id);
+
+        $result = T_disasteroccurs::find($disasteroccurimpacts->T_Disasteroccur_Id);
+
+        $data['model'] = $disasteroccurimpacts;
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurimpact/edit', lang('Form.disasterimpact'), $data);
+        
     }
 
     public function editsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasteroccurimpacts = T_disasteroccurimpacts::find($id);
-            $oldmodel = clone $disasteroccurimpacts;
-
-            $disasteroccurimpacts->parseFromRequest();
-
-            try {
-                $disasteroccurimpacts->validate($oldmodel);
-
-                $disasteroccurimpacts->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurimpact/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurimpact/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $disasteroccurimpacts = T_disasteroccurimpacts::find($id);
+        $oldmodel = clone $disasteroccurimpacts;
+
+        $disasteroccurimpacts->parseFromRequest();
+
+        try {
+            $disasteroccurimpacts->validate($oldmodel);
+
+            $disasteroccurimpacts->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurimpact/{$disasteroccurimpacts->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurimpact/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
 
@@ -113,7 +120,11 @@ class T_disasteroccurimpact extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasteroccur', 'Delete')) {
+        $res = $this->hasPermission('t_disasteroccur', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasteroccurimpacts::find($id);
             $result = $model->delete();
@@ -126,8 +137,6 @@ class T_disasteroccurimpact extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 

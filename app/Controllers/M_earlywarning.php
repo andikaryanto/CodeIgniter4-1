@@ -58,7 +58,7 @@ class M_earlywarning extends Base_Controller
             $earlywarnings->validate();
             $photourl = null;
 
-            $file = $this->request->getFiles('photo');
+            $file = $this->request->getFile('photo');
             if ($file['name']) {
                 $photo = new File("assets/upload/earlywarning", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);

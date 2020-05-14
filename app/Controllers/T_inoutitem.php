@@ -29,103 +29,117 @@ class T_inoutitem extends Base_Controller
 
     public function index()
     {
-        if ($this->hasPermission('t_inoutitem', 'Read')) {
-
-            $this->loadView('t_inoutitem/index', lang('Form.inoutitem'));
+        $res = $this->hasPermission('t_inoutitem', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $this->loadView('t_inoutitem/index', lang('Form.inoutitem'));
+        
     }
 
     public function add()
     {
-        if ($this->hasPermission('t_inoutitem', 'Write')) {
-
-            $inoutitems = new T_inoutitems();
-            $data = setPageData_paging($inoutitems);
-            $this->loadView('t_inoutitem/add', lang('Form.inoutitem'), $data);
+        $res = $this->hasPermission('t_inoutitem', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $inoutitems = new T_inoutitems();
+        $data = setPageData_paging($inoutitems);
+        $this->loadView('t_inoutitem/add', lang('Form.inoutitem'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_inoutitem', 'Write')) {
-
-            $inoutitems = new T_inoutitems();
-            $inoutitems->parseFromRequest();
-
-            try {
-
-                DbTrans::beginTransaction();
-                $inoutitems->validate();
-
-                if($inoutitems->savenew()){
-                    DbTrans::commit();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tinoutitem')->go();
-                }
-            } catch (EloquentException $e) {
-
-                DbTrans::rollback();
-                $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
-                Session::setFlash('add_success_msg', $e->getMessages());
-                return Redirect::redirect("tinoutitem/add")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_inoutitem', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $inoutitems = new T_inoutitems();
+        $inoutitems->parseFromRequest();
+
+        try {
+
+            DbTrans::beginTransaction();
+            $inoutitems->validate();
+
+            if($inoutitems->savenew()){
+                DbTrans::commit();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tinoutitem')->go();
+            }
+        } catch (EloquentException $e) {
+
+            DbTrans::rollback();
+            $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
+            Session::setFlash('add_success_msg', $e->getMessages());
+            return Redirect::redirect("tinoutitem/add")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function edit($id)
     {
-        if ($this->hasPermission('t_inoutitem', 'Write')) {
-
-            $inoutitems = T_inoutitems::find($id);
-            $inoutitems->Date = get_formated_date($inoutitems->Date, "d-m-Y");
-            $data['model'] = $inoutitems;
-            $this->loadView('t_inoutitem/edit', lang('Form.inoutitem'), $data);
+        $res = $this->hasPermission('t_inoutitem', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $inoutitems = T_inoutitems::find($id);
+        $inoutitems->Date = get_formated_date($inoutitems->Date, "d-m-Y");
+        $data['model'] = $inoutitems;
+        $this->loadView('t_inoutitem/edit', lang('Form.inoutitem'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('t_inoutitem', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $inoutitems = T_inoutitems::find($id);
-            $oldmodel = clone $inoutitems;
-
-            $inoutitems->parseFromRequest();
-
-
-            try {
-
-                DbTrans::beginTransaction();
-                $inoutitems->validate($oldmodel);
-
-                if($inoutitems->saveedit($oldmodel)){
-                    DbTrans::commit();
-                    Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                    return Redirect::redirect('tinoutitem')->go();
-                }
-
-            } catch (EloquentException $e) {
-                DbTrans::rollback();
-                $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
-                Session::setFlash('edit_warning_msg', $e->getMessages());
-                return Redirect::redirect("tinoutitem/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_inoutitem', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $id = $this->request->getPost('Id');
+
+        $inoutitems = T_inoutitems::find($id);
+        $oldmodel = clone $inoutitems;
+
+        $inoutitems->parseFromRequest();
+
+
+        try {
+
+            DbTrans::beginTransaction();
+            $inoutitems->validate($oldmodel);
+
+            if($inoutitems->saveedit($oldmodel)){
+                DbTrans::commit();
+                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+                return Redirect::redirect('tinoutitem')->go();
+            }
+
+        } catch (EloquentException $e) {
+            DbTrans::rollback();
+            $e->getEntity()->Date = get_formated_date($e->getEntity()->Date, 'd-m-Y');
+            Session::setFlash('edit_warning_msg', $e->getMessages());
+            return Redirect::redirect("tinoutitem/edit/{$id}")->with($e->getEntity())->go();
+        }
+        
     }
 
     public function copy($id)
     {
 
-        if ($this->hasPermission('t_inoutitem', 'Write')) {
-            $copied = T_inoutitems::find($id);
-            $newdata = T_inoutitems::copy($copied);
-            Session::setFlash('success_msg', array(0 => "Data Baru Terbuat Dengan Nomor : {$newdata->TransNo}"));
-            return Redirect::redirect("tinoutitem/edit/{$newdata->Id}")->go();
+        $res = $this->hasPermission('t_inoutitem', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $copied = T_inoutitems::find($id);
+        $newdata = T_inoutitems::copy($copied);
+        Session::setFlash('success_msg', array(0 => "Data Baru Terbuat Dengan Nomor : {$newdata->TransNo}"));
+        return Redirect::redirect("tinoutitem/edit/{$newdata->Id}")->go();
+        
     }
 
 
@@ -133,7 +147,11 @@ class T_inoutitem extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_inoutitem', 'Delete')) {
+        $res = $this->hasPermission('t_inoutitem', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_inoutitems::find($id);
 

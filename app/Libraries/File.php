@@ -4,6 +4,7 @@ namespace App\Libraries;
 
 use DateTime;
 use DateTimeZone;
+use \CodeIgniter\HTTP\Files\UploadedFile;
 
 class File
 {
@@ -24,10 +25,10 @@ class File
         $this->maxsize = $maxsize;
     }
 
-    public function upload(array $files, $usePrefixName = true)
+    public function upload(UploadedFile $files, $usePrefixName = true)
     {
 
-        if ($this->maxsize != 0 && $files['size'] > $this->maxsize) {
+        if ($this->maxsize != 0 && $files->getSize() > $this->maxsize) {
 
             $this->errormsg = lang('File.size_too_large');
             return false;
@@ -40,18 +41,17 @@ class File
                 return false;
             }
 
-        if (!file_exists(ROOT . DS . $this->destination))
-            mkdir(ROOT . DS . $this->destination, 0777, true);
-
+        if (!file_exists(FCPATH. $this->destination))
+            mkdir(FCPATH . $this->destination, 0777, true);
         $nameex = "";
         if ($usePrefixName) {
             $date = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
             $nameex = $date->format("Ymd_His");
         }
 
-        if (move_uploaded_file($files['tmp_name'], ROOT . DS . $this->destination . DS . $nameex . str_replace(" ","-",$files['name']))) {
+        if (move_uploaded_file($files->getTempName(), FCPATH . $this->destination . DIRECTORY_SEPARATOR . $nameex . str_replace(" ","-",$files->getName()))) {
 
-            $this->urlfile = $this->destination . "/" . $nameex . str_replace(" ","-",$files['name']);
+            $this->urlfile = $this->destination . "/" . $nameex . str_replace(" ","-",$files->getName());
             return true;
         }
 
@@ -68,9 +68,9 @@ class File
         return $this->errormsg;
     }
 
-    public function getExtension(array $files)
+    public function getExtension(UploadedFile $files)
     {
-        return pathinfo($files['name'], PATHINFO_EXTENSION);
+        return pathinfo($files->getExtension(), PATHINFO_EXTENSION);
     }
 
     public function setExtension($fileType)

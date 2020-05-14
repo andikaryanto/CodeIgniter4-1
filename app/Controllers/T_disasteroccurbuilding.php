@@ -23,118 +23,121 @@ class T_disasteroccurbuilding extends Base_Controller
 
     public function index($iddisasteroccur)
     {
-        if ($this->hasPermission('t_disasteroccur', 'Read')) {
-            $result = T_disasteroccurs::find($iddisasteroccur);
-            $data['model'] = $result;
-
-            $this->loadView('t_disasteroccurbuilding/index', lang('Form.disasterbuilding'), $data);
+        $res = $this->hasPermission('t_disasteroccur', 'Read');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+        $data['model'] = $result;
+
+        $this->loadView('t_disasteroccurbuilding/index', lang('Form.disasterbuilding'), $data);
+        
     }
 
     public function add($iddisasteroccur)
-    {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $result = T_disasteroccurs::find($iddisasteroccur);
-            // if($result->Status == T_disasteroccursStatus::DONE){
-            //     $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-            //     Session::setFlash('edit_warning_msg', array(0 => "Dampak bangunan Transaksi $result->TransNo tidak bisa diubah, Status : {$status}"));
-            //     return Redirect::redirect("tdisasteroccurbuilding/{$result->Id}")->go();
-            // }
-
-            $disasteroccurbuildings = new T_disasteroccurbuildings();
-
-            $data = setPageData_paging($disasteroccurbuildings);
-
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurbuilding/add', lang('Form.disasterbuilding'), $data);
+    { 
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+        $result = T_disasteroccurs::find($iddisasteroccur);
+
+        $disasteroccurbuildings = new T_disasteroccurbuildings();
+
+        $data = setPageData_paging($disasteroccurbuildings);
+
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurbuilding/add', lang('Form.disasterbuilding'), $data);
+        
     }
 
     public function addsave()
     {
-
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            $disasteroccurbuildings = new T_disasteroccurbuildings();
-            $disasteroccurbuildings->parseFromRequest();
-            
-            
-            try {
-                $disasteroccurbuildings->validate();
-
-                $result = T_disasteroccurs::find($disasteroccurbuildings->T_Disasteroccur_Id);
-                if($result->Status == T_disasteroccursStatus::DONE){
-                    $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                    throw new EloquentException("Dampak bangunan Transaksi $result->TransNo tidak bisa ditambah, Status : {$status}", $disasteroccurbuildings, ResponseCode::INVALID_DATA);
-                    // echo json_encode($disasteroccurbuildings->get_M_Familycard()->FamilyCardNo);
-                    // exit;
-                }
-
-                $disasteroccurbuildings->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurbuilding/add/{$disasteroccurbuildings->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurbuilding/add/{$disasteroccurbuildings->T_Disasteroccur_Id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
-    }
+        $disasteroccurbuildings = new T_disasteroccurbuildings();
+        $disasteroccurbuildings->parseFromRequest();
+        
+        
+        try {
+            $disasteroccurbuildings->validate();
 
-    public function edit($id)
-    {
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-
-            // $disasteroccurbuildings = T_disasteroccurs::find($id);
-            $disasteroccurbuildings = T_disasteroccurbuildings::find($id);
             $result = T_disasteroccurs::find($disasteroccurbuildings->T_Disasteroccur_Id);
             if($result->Status == T_disasteroccursStatus::DONE){
                 $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurbuilding/{$result->Id}")->go();
-            } 
+                throw new EloquentException("Dampak bangunan Transaksi $result->TransNo tidak bisa ditambah, Status : {$status}", $disasteroccurbuildings, ResponseCode::INVALID_DATA);
+                // echo json_encode($disasteroccurbuildings->get_M_Familycard()->FamilyCardNo);
+                // exit;
+            }
 
+            $disasteroccurbuildings->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurbuilding/add/{$disasteroccurbuildings->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
 
-            $data['model'] = $disasteroccurbuildings;
-            $data['disasteroccur'] = $result;
-            $this->loadView('t_disasteroccurbuilding/edit', lang('Form.disasterbuilding'), $data);
+            Session::setFlash('add_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurbuilding/add/{$disasteroccurbuildings->T_Disasteroccur_Id}")->with($e->getEntity())->go();
         }
+        
+    }
+
+    public function edit($id)
+    { 
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
+        }
+        $disasteroccurbuildings = T_disasteroccurbuildings::find($id);
+        $result = T_disasteroccurs::find($disasteroccurbuildings->T_Disasteroccur_Id);
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurbuilding/{$result->Id}")->go();
+        } 
+
+
+        $data['model'] = $disasteroccurbuildings;
+        $data['disasteroccur'] = $result;
+        $this->loadView('t_disasteroccurbuilding/edit', lang('Form.disasterbuilding'), $data);
+        
     }
 
     public function editsave()
     {
 
-        if ($this->hasPermission('t_disasteroccur', 'Write')) {
-
-            $id = $this->request->getPost('Id');
-
-            $disasteroccurbuildings = T_disasteroccurbuildings::find($id);
-            $result = T_disasteroccurs::find($disasteroccurbuildings->T_Disasteroccur_Id);
-            if($result->Status == T_disasteroccursStatus::DONE){
-                $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
-                Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
-                return Redirect::redirect("tdisasteroccurbuilding/{$result->Id}")->go();
-            }
-
-            $oldmodel = clone $disasteroccurbuildings;
-
-            $disasteroccurbuildings->parseFromRequest();
-
-            try {
-                $disasteroccurbuildings->validate($oldmodel);
-
-                $disasteroccurbuildings->save();
-                Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
-                return Redirect::redirect("tdisasteroccurbuilding/{$disasteroccurbuildings->T_Disasteroccur_Id}")->go();
-            } catch (EloquentException $e) {
-
-                Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
-                return Redirect::redirect("tdisasteroccurbuilding/edit/{$id}")->with($e->getEntity())->go();
-            }
+        $res = $this->hasPermission('t_disasteroccur', 'Write');
+        if($res instanceof \CodeIgniter\HTTP\RedirectResponse){
+            return $res;
         }
+
+        $id = $this->request->getPost('Id');
+
+        $disasteroccurbuildings = T_disasteroccurbuildings::find($id);
+        $result = T_disasteroccurs::find($disasteroccurbuildings->T_Disasteroccur_Id);
+        if($result->Status == T_disasteroccursStatus::DONE){
+            $status = M_enumdetails::findEnumName("DisasterOccurStatus", $result->Status);
+            Session::setFlash('edit_warning_msg', array(0 => "Transaksi $result->TransNo tidak bisa diubah korban, Status : {$status}"));
+            return Redirect::redirect("tdisasteroccurbuilding/{$result->Id}")->go();
+        }
+
+        $oldmodel = clone $disasteroccurbuildings;
+
+        $disasteroccurbuildings->parseFromRequest();
+
+        try {
+            $disasteroccurbuildings->validate($oldmodel);
+
+            $disasteroccurbuildings->save();
+            Session::setFlash('success_msg', array(0 => lang('Form.datasaved')));
+            return Redirect::redirect("tdisasteroccurbuilding/{$disasteroccurbuildings->T_Disasteroccur_Id}")->go();
+        } catch (EloquentException $e) {
+
+            Session::setFlash('edit_warning_msg', array(0 => $e->getMessages()));
+            return Redirect::redirect("tdisasteroccurbuilding/edit/{$id}")->with($e->getEntity())->go();
+        }
+    
     }
 
 
@@ -142,7 +145,11 @@ class T_disasteroccurbuilding extends Base_Controller
     {
 
         $id = $this->request->getPost("id");
-        if ($this->hasPermission('t_disasteroccur', 'Delete')) {
+        $res = $this->hasPermission('t_disasteroccur', 'Delete');
+
+        if(!$res){
+            echo json_encode(deleteStatus(lang("Info.no_access_delete"), FALSE, TRUE));
+        } else {
 
             $model = T_disasteroccurbuildings::find($id);
             $result = $model->delete();
@@ -155,8 +162,6 @@ class T_disasteroccurbuilding extends Base_Controller
                     echo json_encode(deleteStatus($deletemsg));
                 }
             }
-        } else {
-            echo json_encode(deleteStatus("", FALSE, TRUE));
         }
     }
 
