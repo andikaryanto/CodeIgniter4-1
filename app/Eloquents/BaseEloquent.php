@@ -5,8 +5,8 @@ use CodeIgniter\Config\Services;
 
 class BaseEloquent extends Eloquent{
     
-    public $dbs;
-    private $request;
+    protected $dbs;
+    protected $request;
     public function __construct()
     {
         $this->dbs = \Config\Database::connect();

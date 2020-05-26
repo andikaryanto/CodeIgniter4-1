@@ -2,13 +2,14 @@
 
 namespace App\Controllers\Rests;
 
+use App\Classes\Exception\EloquentException;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\G_transactionnumbers;
-use App\Models\M_enumdetails;
-use App\Models\M_forms;
-use App\Models\T_disasteroccurs;
-use App\Models\T_disasterreports;
+use App\Eloquents\G_transactionnumbers;
+use App\Eloquents\M_enumdetails;
+use App\Eloquents\M_forms;
+use App\Eloquents\T_disasteroccurs;
+use App\Eloquents\T_disasterreports;
 use Core\Nayo_Exception;
 use Exception;
 use Firebase\JWT\JWT;
@@ -25,9 +26,9 @@ class DisasterOccur extends Base_Rest
 
         if ($this->isGranted('t_disasteroccur', 'Read')) {
 
-            $showImage = $this->request->get("showimage");
-            $page = $this->request->get("page");
-            $size = $this->request->get("size");
+            $showImage = $this->request->getGet("showimage");
+            $page = $this->request->getGet("page");
+            $size = $this->request->getGet("size");
             $params = [
                 'order' => [
                     'Created' => 'DESC'
@@ -38,7 +39,7 @@ class DisasterOccur extends Base_Rest
                 ]
             ];
 
-            $disasters = T_disasteroccurs::getAll($params);
+            $disasters = T_disasteroccurs::findAll($params);
             $occurs = [];
 
             foreach ($disasters as $disaster) {
@@ -48,7 +49,7 @@ class DisasterOccur extends Base_Rest
                 $district = $subdistrict->get_M_District();
                 $province = $district->get_M_Province();
                 $disaster->Noref = $disaster->get_T_Disasterreport()->ReportNo;
-                $disaster->StatusName = M_enumdetails::getEnumName("DisasterOccurStatus", $disaster->Status);
+                $disaster->StatusName = M_enumdetails::findEnumName("DisasterOccurStatus", $disaster->Status);
                 $disaster->DisasterName = $disaster->get_M_Disaster()->Name;
                 $disaster->Address = "{$subvillage->Name} {$disaster->RT}/{$disaster->RW}, {$village->Name}, {$subdistrict->Name}, {$district->Name}, {$province->Name}";
                 if($showImage == "true"){
@@ -76,15 +77,15 @@ class DisasterOccur extends Base_Rest
             ];
 
             // echo json_encode(sss);
-            $this->response->json($result, 200);
+            
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         } else {
             $result = [
                 'Message' => 'Tidak ada akses untuk user anda',
                 'Status' => ResponseCode::NO_ACCESS_USER_MODULE
             ];
-
-            // echo json_encode(sss);
-            $this->response->json($result, 400);
+            
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -93,7 +94,7 @@ class DisasterOccur extends Base_Rest
 
         if ($this->isGranted('t_disasteroccur', 'Read')) {
 
-            $disaster = T_disasteroccurs::get($id);
+            $disaster = T_disasteroccurs::find($id);
 
             $subvillage = $disaster->get_M_Subvillage();
             $village = $subvillage->get_M_Village();
@@ -102,7 +103,7 @@ class DisasterOccur extends Base_Rest
             $province = $district->get_M_Province();
             $disaster->NeedLogistic = $disaster->IsNeedLogistic == 1 ? "Ya" : "Tidak";
             $disaster->Noref = $disaster->get_T_Disasterreport()->ReportNo;
-            $disaster->StatusName = M_enumdetails::getEnumName("DisasterOccurStatus", $disaster->Status);
+            $disaster->StatusName = M_enumdetails::findEnumName("DisasterOccurStatus", $disaster->Status);
             $disaster->DisasterName = $disaster->get_M_Disaster()->Name;
             $disaster->Address = "{$subvillage->Name} {$disaster->RT}/{$disaster->RW}, {$village->Name}, {$subdistrict->Name}, {$district->Name}, {$province->Name}";
             // $disaster->Photo64 = base64_decode($disaster->Photo64);
@@ -114,7 +115,8 @@ class DisasterOccur extends Base_Rest
             ];
 
             // echo json_encode(sss);
-            $this->response->json($result, 200);
+            
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         } else {
             $result = [
                 'Message' => 'Tidak ada akses untuk user anda',
@@ -122,7 +124,8 @@ class DisasterOccur extends Base_Rest
             ];
 
             // echo json_encode(sss);
-            $this->response->json($result, 400);
+            
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -135,13 +138,10 @@ class DisasterOccur extends Base_Rest
                 $token = $this->response->getHeader('authorization');
                 $jwt = JWT::decode($token, getSecretKey(), array('HS256'));
                 $disasteroccur = null;
-                $raw = $this->restrequest->getRawBody();
-                // $disasteroccur->setMobile();
-    
-                $body = json_decode($raw);
+                $body = $this->request->getJSON();
     
                 if ($body->Id != 0)
-                    $disasteroccur = T_disasteroccurs::get($body->Id);
+                    $disasteroccur = T_disasteroccurs::find($body->Id);
                 else 
                     $disasteroccur = new T_disasteroccurs();
     
@@ -164,9 +164,9 @@ class DisasterOccur extends Base_Rest
                 $disasteroccur->validate();
     
                 if ($body->Id == 0 || is_null($body->Id)) {
-                    $formid = M_forms::getDataByName('t_disasteroccurs')->Id;
+                    $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
                     $disasteroccur->Id = null;
-                    $disasteroccur->TransNo = G_transactionnumbers::getLastNumberByFormId($formid, date('Y'), date("m"));
+                    $disasteroccur->TransNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
 
 
                     $id = $disasteroccur->save();
@@ -178,7 +178,8 @@ class DisasterOccur extends Base_Rest
                         'Result' => [$disasteroccur],
                         'Status' => ResponseCode::OK
                     ];
-                    $this->response->json($result, 200);
+                    
+                    $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
                 } else {
 
                     // if(!empty($disasteroccur->Photo64))
@@ -191,15 +192,15 @@ class DisasterOccur extends Base_Rest
                         'Result' => [$disasteroccur], // cant store back much data
                         'Status' => ResponseCode::OK
                     ];
-                    $this->response->json($result, 200);
+                    $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
                 }
             }
-        } catch(Nayo_Exception $e){
+        } catch(EloquentException $e){
             $result = [
                 'Message' => $e->messages,
                 'Status' => ResponseCode::INVALID_DATA
             ];
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
         
     }
@@ -215,10 +216,10 @@ class DisasterOccur extends Base_Rest
                 $userid = $jwt->Id;
             }
 
-            $raw = $this->restrequest->getRawBody();
-            $body = json_decode($raw);
+            $body = $this->request->getJSON();
+            
 
-            $report = T_disasteroccurs::get($body->Id);
+            $report = T_disasteroccurs::find($body->Id);
 
             if ($report) {
                 $report->M_User_Id = $userid;
@@ -231,18 +232,18 @@ class DisasterOccur extends Base_Rest
                 ];
 
                 // echo json_encode(sss);
-                $this->response->json($result, 200);
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
             } else {
-                Nayo_Exception::throw("Data Tidak Ditemukan", null, ResponseCode::DATA_NOT_FOUND);
+                throw new EloquentException("Data Tidak Ditemukan", null, ResponseCode::DATA_NOT_FOUND);
             }
-        } catch (Nayo_Exception $e) {
+        } catch (EloquentException $e) {
             $result = [
                 'Message' => $e->messages,
                 'Status' => $e->status
             ];
 
             // echo json_encode(sss);
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 }

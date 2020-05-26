@@ -4,9 +4,9 @@ namespace App\Controllers\Rests;
 
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_disasters;
-use App\Models\M_enumdetails;
-use App\Models\T_disasteroccurs;
+use App\Eloquents\M_disasters;
+use App\Eloquents\M_enumdetails;
+use App\Eloquents\T_disasteroccurs;
 use Core\Nayo_Exception;
 use Exception;
 use Firebase\JWT\JWT;
@@ -23,7 +23,7 @@ class Disaster extends Base_Rest
 
         // if ($this->isGranted('t_disasteroccur', 'Read')) {
 
-            $disasters = M_disasters::getAll();
+            $disasters = M_disasters::findAll();
             foreach($disasters as $disaster){
                 $disaster->value = $disaster->Id;
                 $disaster->display = $disaster->Name;
@@ -35,7 +35,7 @@ class Disaster extends Base_Rest
                 'Status' => ResponseCode::OK
             ];   
 
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
         // } else {
             // $result = [
             //     'Message' => 'Tidak ada akses untuk user anda',

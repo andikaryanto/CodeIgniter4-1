@@ -2,13 +2,14 @@
 
 namespace App\Controllers\Rests;
 
+use App\Classes\Exception\EloquentException;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_formsettings;
-use App\Models\M_userlocations;
-use App\Models\M_users;
-use App\Models\T_disasteroccurs;
-use App\Models\T_disasterreports;
+use App\Eloquents\M_formsettings;
+use App\Eloquents\M_userlocations;
+use App\Eloquents\M_users;
+use App\Eloquents\T_disasteroccurs;
+use App\Eloquents\T_disasterreports;
 use Core\Nayo_Exception;
 use Firebase\JWT\JWT;
 
@@ -27,7 +28,7 @@ class User extends Base_Rest
 
             $query = M_users::login($username, $password);
             if (!$query) {
-                Nayo_Exception::throw(array(0 => lang('Error.failed_login')), null, ResponseCode::INVALID_LOGIN);
+                throw new EloquentException(array(0 => lang('Error.failed_login')), null, ResponseCode::INVALID_LOGIN);
             }
 
             $jwt = JWT::encode($query, getSecretKey());
@@ -37,13 +38,13 @@ class User extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
             // $decoded = JWT::decode($jwt, $key, array('HS256')); 
-            $this->response->json($result, 200);
-        } catch (Nayo_Exception $e) {
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
+        } catch (EloquentException $e) {
             $result = [
                 'Message' => $e->messages[0],
                 'Status' => $e->status
             ];
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -56,8 +57,8 @@ class User extends Base_Rest
             $userid = $jwt->Id;
         }
 
-        $raw = $this->restrequest->getRawBody();
-        $body = json_decode($raw);
+        $body = $this->restrequest->getJSON();
+        
 
         $params = [
             'where' => [
@@ -66,7 +67,7 @@ class User extends Base_Rest
         ];
 
         $latestlocation = null;;
-        $location = M_userlocations::getOne($params);
+        $location = M_userlocations::findOne($params);
 
         if ($location) {
             $location->Latitude = $body->Latitude;
@@ -88,19 +89,19 @@ class User extends Base_Rest
             'Status' => ResponseCode::OK
         ];
 
-        $this->response->json($result, 200);
+        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 
     public function getUserLocation()
     {
         try {
 
-            $userid = $this->request->get("userid");
+            $userid = $this->request->getGet("userid");
 
             $tracklocation = M_formsettings::getMUserLocation();
 
             if ($tracklocation->BooleanValue == 0)
-                Nayo_Exception::throw("Pengaturan Telusur User Tidak Aktif", null, ResponseCode::FAILED_TRACK_LOCATION);
+                throw new EloquentException("Pengaturan Telusur User Tidak Aktif", null, ResponseCode::FAILED_TRACK_LOCATION);
 
             $params = [
                 "join" => [
@@ -115,13 +116,13 @@ class User extends Base_Rest
                 ]
 
             ];
-            $locations = M_userlocations::getAll($params);
+            $locations = M_userlocations::findAll($params);
 
             if (count($locations) > 0) {
                 $data = [];
                 foreach ($locations as $location) {
 
-                    $user = M_users::get($location->M_User_Id);
+                    $user = M_users::find($location->M_User_Id);
                     $params = [
                         'order' => [
                             "Modified" => "DESC"
@@ -140,8 +141,8 @@ class User extends Base_Rest
                         ]
                         ];
 
-                    $occur = T_disasteroccurs::getOne($params);
-                    $report = T_disasterreports::getOne($params);
+                    $occur = T_disasteroccurs::findOne($params);
+                    $report = T_disasterreports::findOne($params);
                     if($occur && $report){
                         $occurdate = get_date($occur->Modified);
                         $reportdate = get_date($report->Modified);
@@ -189,25 +190,25 @@ class User extends Base_Rest
                     'Status' => ResponseCode::OK
                 ];
 
-                $this->response->json($result, 200);
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
             } else {
-                Nayo_Exception::throw("Tidak Ada Data Untuk Ditampilkan", null, ResponseCode::NO_DATA_FOUND);
+                throw new EloquentException("Tidak Ada Data Untuk Ditampilkan", null, ResponseCode::NO_DATA_FOUND);
             }
-        } catch (Nayo_Exception $e) {
+        } catch (EloquentException $e) {
 
             $result = [
                 'Message' => $e->messages,
                 'Status' => $e->status
             ];
 
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
     public function startMoving(){
 
-        $raw = $this->restrequest->getRawBody();
-        $body = json_decode($raw);
+        $body = $this->restrequest->getJSON();
+        
 
         $userid = null;
         $token = $this->response->getHeader('Authorization');
@@ -216,7 +217,7 @@ class User extends Base_Rest
             $userid = $jwt->Id;
         }
 
-        $users = M_users::get($userid);
+        $users = M_users::find($userid);
         $users->IsStartMoving = $body->StartMoving;
         $users->save();
 
@@ -225,6 +226,6 @@ class User extends Base_Rest
             'Status' => ResponseCode::OK
         ];
 
-        $this->response->json($result, 200);
+        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 }

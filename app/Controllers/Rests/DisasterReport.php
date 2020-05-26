@@ -2,15 +2,16 @@
 
 namespace App\Controllers\Rests;
 
+use App\Classes\Exception\EloquentException;
 use App\Controllers\M_user;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\G_transactionnumbers;
-use App\Models\M_enumdetails;
-use App\Models\M_forms;
-use App\Models\M_users;
-use App\Models\T_disasteroccurs;
-use App\Models\T_disasterreports;
+use App\Eloquents\G_transactionnumbers;
+use App\Eloquents\M_enumdetails;
+use App\Eloquents\M_forms;
+use App\Eloquents\M_users;
+use App\Eloquents\T_disasteroccurs;
+use App\Eloquents\T_disasterreports;
 use Core\Nayo_Exception;
 use Exception;
 use Firebase\JWT\JWT;
@@ -41,7 +42,7 @@ class DisasterReport extends Base_Rest
                 $userid = $jwt->Id;
             }
 
-            $disasters = T_disasterreports::getAll($params);
+            $disasters = T_disasterreports::findAll($params);
             $occurs = [];
 
             foreach ($disasters as $disaster) {
@@ -64,7 +65,7 @@ class DisasterReport extends Base_Rest
                         $disaster->Editable = 0;
                     }
                     if ($disaster->M_User_Id) {
-                        $disaster->HandledBy = M_users::get($disaster->M_User_Id)->Username;
+                        $disaster->HandledBy = M_users::find($disaster->M_User_Id)->Username;
                     } else {
                         $disaster->HandledBy = "";
                     }
@@ -81,23 +82,21 @@ class DisasterReport extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         } else {
             $result = [
                 'Message' => 'Tidak ada akses untuk user anda',
                 'Status' => ResponseCode::NO_ACCESS_USER_MODULE
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
     public function getDisasterReportsByPhone($phone)
     {
-        $page = $this->request->get("page");
-        $size = $this->request->get("size");
+        $page = $this->request->getGet("page");
+        $size = $this->request->getGet("size");
         $where = [
             'where' => [
                 'Phone' => $phone
@@ -110,7 +109,7 @@ class DisasterReport extends Base_Rest
                 'size' => $size
             ]
         ];
-        $disasters = T_disasterreports::getAll($where);
+        $disasters = T_disasterreports::findAll($where);
         $occurs = [];
 
         foreach ($disasters as $disaster) {
@@ -135,8 +134,7 @@ class DisasterReport extends Base_Rest
             'Status' => ResponseCode::OK
         ];
 
-        // echo json_encode(sss);
-        $this->response->json($result, 200);
+        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 
     public function postDisasterReport()
@@ -144,11 +142,11 @@ class DisasterReport extends Base_Rest
 
         // if ($this->isGranted('t_disasterreport', 'Write')) {
 
-        $raw = $this->restrequest->getRawBody();
+        $body = $this->restrequest->getJSON();
         $disasterreport = new T_disasterreports();
         // $disasterreport->setMobile();
 
-        $body = json_decode($raw);
+        
 
 
         foreach ($body as $k => $v) {
@@ -162,19 +160,19 @@ class DisasterReport extends Base_Rest
         // $disasterreport->Photo64 = base64_encode($disasterreport->Photo64);
         // $this->response->json($disasterreport, 200);
         $validate = null;
-        if(!$this->request->get("public"))
+        if(!$this->request->getGet("public"))
             $validate = $disasterreport->validate();
         if ($validate) {
             $result = [
                 'Message' => $validate[0],
                 'Status' => ResponseCode::FAILED_SAVE_DATA
             ];
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         } else {
 
-            $formid = M_forms::getDataByName('t_disasterreports')->Id;
+            $formid = M_forms::findDataByName('t_disasterreports')->Id;
 
-            $disasterreport->ReportNo = G_transactionnumbers::getLastNumberByFormId($formid, date('Y'), date("m"));
+            $disasterreport->ReportNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
             $id = $disasterreport->save();
             if ($id) {
                 $disasterreport->Id = $id;
@@ -185,7 +183,7 @@ class DisasterReport extends Base_Rest
                     'Result' => [$disasterreport],
                     'Status' => ResponseCode::OK
                 ];
-                $this->response->json($result, 200);
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
             } else {
                 $disasterreport->Photo64 = null;
                 $result = [
@@ -193,7 +191,7 @@ class DisasterReport extends Base_Rest
                     'Result' => [$disasterreport],
                     'Status' => ResponseCode::FAILED_SAVE_DATA
                 ];
-                $this->response->json($result, 400);
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
             }
         }
         // } else {
@@ -212,15 +210,15 @@ class DisasterReport extends Base_Rest
         $status = array();
         try {
             if ($this->isGranted('t_disasteroccur', 'Write')) {
-                $raw = $this->restrequest->getRawBody();
-                $body = json_decode($raw);
+                $body = $this->restrequest->getJSON();
+                
                 if (isset($body->Id)) {
-                    $disasterreport = T_disasterreports::get($body->Id);
+                    $disasterreport = T_disasterreports::find($body->Id);
                     if ($disasterreport) {
                         $disasteroccurs = new T_disasteroccurs();
                         $disasteroccurs->copyFromReport($disasterreport);
-                        $formid = M_forms::getDataByName('t_disasteroccurs')->Id;
-                        $disasteroccurs->TransNo = G_transactionnumbers::getLastNumberByFormId($formid, date('Y'), date("m"));
+                        $formid = M_forms::findDataByName('t_disasteroccurs')->Id;
+                        $disasteroccurs->TransNo = G_transactionnumbers::findLastNumberByFormId($formid, date('Y'), date("m"));
                         $disasteroccurs->save();
                         G_transactionnumbers::updateLastNumber($formid, date('Y'), date("m"));
 
@@ -229,12 +227,12 @@ class DisasterReport extends Base_Rest
                             'Result' => $disasteroccurs,
                             'Status' => ResponseCode::OK
                         ];
-                        $this->response->json($result, 200);
+                        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
                     } else {
-                        Nayo_Exception::throw(array(0 => "Tidak dapat diubah menjadi aktual. Data tidak ada"));
+                        throw new EloquentException("Tidak dapat diubah menjadi aktual. Data tidak ada", $disasteroccurs);
                     }
                 } else {
-                    Nayo_Exception::throw(array(0 => "Tidak dapat diubah menjadi aktual. Data tidak ada"));
+                    throw new EloquentException("Tidak dapat diubah menjadi aktual. Data tidak ada", $disasteroccurs);
                 }
             } else {
                 $result = [
@@ -242,16 +240,15 @@ class DisasterReport extends Base_Rest
                     'Status' => ResponseCode::NO_ACCESS_USER_MODULE
                 ];
 
-                // echo json_encode(sss);
-                $this->response->json($result, 400);
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
             }
-        } catch (Nayo_Exception $e) {
+        } catch (EloquentException $e) {
             $result = [
                 'Message' => $e->messages[0],
                 'Status' => ResponseCode::DATA_NOT_FOUND
             ];
 
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -261,11 +258,11 @@ class DisasterReport extends Base_Rest
         try {
             if ($this->isGranted('t_disasterreport', 'Write')) {
 
-                $disasterreport = T_disasterreports::get($id);
+                $disasterreport = T_disasterreports::find($id);
                 // $disasterreport->setMobile();
 
                 if (!$disasterreport) {
-                    Nayo_Exception::throw(array(0 => 'Data tidak ada'), $disasterreport);
+                    throw new EloquentException(array(0 => 'Data tidak ada'), $disasterreport);
                 }
 
                 $disasterreport->delete();
@@ -274,24 +271,23 @@ class DisasterReport extends Base_Rest
                     'Result' => $disasterreport,
                     'Status' => ResponseCode::OK
                 ];
-                $this->response->json($result, 200);
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
             } else {
                 $result = [
                     'Message' => 'Tidak ada akses untuk user anda',
                     'Status' => ResponseCode::NO_ACCESS_USER_MODULE
                 ];
 
-                // echo json_encode(sss);
-                $this->response->json($result, 400);
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
             }
-        } catch (Nayo_Exception $e) {
+        } catch (EloquentException $e) {
 
             $results = [
                 'Message' => $e->messages[0],
                 'Status' => ResponseCode::DATA_NOT_FOUND
             ];
 
-            $this->response->json($results, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -306,10 +302,10 @@ class DisasterReport extends Base_Rest
                 $userid = $jwt->Id;
             }
 
-            $raw = $this->restrequest->getRawBody();
-            $body = json_decode($raw);
+            $body = $this->restrequest->getJSON();
+            
 
-            $report = T_disasterreports::get($body->ReportId);
+            $report = T_disasterreports::find($body->ReportId);
 
             if ($report) {
                 $report->M_User_Id = $userid;
@@ -321,19 +317,17 @@ class DisasterReport extends Base_Rest
                     'Status' => ResponseCode::OK
                 ];
 
-                // echo json_encode(sss);
-                $this->response->json($result, 200);
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
             } else {
-                Nayo_Exception::throw("Data Tidak Ditemukan", null, ResponseCode::DATA_NOT_FOUND);
+                throw new EloquentException("Data Tidak Ditemukan", null, ResponseCode::DATA_NOT_FOUND);
             }
-        } catch (Nayo_Exception $e) {
+        } catch (EloquentException $e) {
             $result = [
                 'Message' => $e->messages,
                 'Status' => $e->status
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($result, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 
@@ -344,7 +338,7 @@ class DisasterReport extends Base_Rest
                 'ReportNo' => str_replace("_", "/", $reportno)
             ]
         ];
-        $disasters = T_disasterreports::getOne($where);
+        $disasters = T_disasterreports::findOne($where);
 
         foreach ($disasters as $disaster) {
             $disaster->Photo64 = null;
@@ -367,8 +361,7 @@ class DisasterReport extends Base_Rest
             'Status' => ResponseCode::OK
         ];
 
-        // echo json_encode(sss);
-        $this->response->json($result, 200);
+        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 
     public function getDisasterReportById($id)
@@ -376,7 +369,7 @@ class DisasterReport extends Base_Rest
 
         // if ($this->isGranted('t_disasterreport', 'Read')) {
 
-            $disaster = T_disasterreports::get($id);
+            $disaster = T_disasterreports::find($id);
 
             $subvillage = $disaster->get_M_Subvillage();
             $village = $subvillage->get_M_Village();
@@ -395,8 +388,7 @@ class DisasterReport extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         // } else {
         //     $result = [
         //         'Message' => 'Tidak ada akses untuk user anda',

@@ -5,36 +5,24 @@ namespace App\Controllers\Rests;
 // header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
-use Core\Nayo_Controller;
-use App\Models\M_users;
+use App\Controllers\Base_Controller;
 use \Firebase\JWT\JWT;
 use Core\Rest\Response;
 use yidas\http\Request;
 
-class Base_Rest extends Nayo_Controller
+class Base_Rest extends Base_Controller
 {
 
-    protected $response = false;
-    protected $restrequest = false;
 
     public function __construct()
     {
         
-
-        if (!$this->response) {
-            $this->response = new Response();
-        }
-
-        if (!$this->restrequest)
-            $this->restrequest = new Request();
-
-        parent::__construct();
     }
 
     public function isGranted($form = "", $role = "")
     {
 
-        $token = $this->response->getHeader('authorization');
+        $token = $this->request->getHeader('Authorization');
         $jwt = JWT::decode($token, getSecretKey(), array('HS256'));
         if($jwt){
             if (isPermittedMobile_paging($jwt->Username, $jwt->M_Groupuser_Id, form_paging()[$form], $role)) {

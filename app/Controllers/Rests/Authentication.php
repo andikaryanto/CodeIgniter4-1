@@ -1,20 +1,20 @@
 <?php
 namespace App\Controllers\Rests;
-use Core\Nayo_Controller;
-use App\Models\M_users;
+
+use App\Controllers\Base_Controller;
+use App\Eloquents\M_users;
 use \Firebase\JWT\JWT;
 
-class Authentication extends Nayo_Controller {
+class Authentication extends Base_Controller {
 
     public function __construct()
     {
-        parent::__construct();
     }
 
     public function login(){
 
-        $username = $this->request->get('username');
-        $password = $this->request->get('password');
+        $username = $this->request->getGet('username');
+        $password = $this->request->getGet('password');
 
         if($username && $password){
             $user = new M_users();
@@ -33,13 +33,13 @@ class Authentication extends Nayo_Controller {
                 'token' => $jwt
             ];
             
-            echo json_encode($return);
+            $this->response->setStatusCode(200)->setJSON($return)->sendBody();
         } else {
             $return = [
                 'message' => lang('Info.failed_logged_in')
             ];
             
-            echo json_encode($return);
+            $this->response->setStatusCode(400)->setJSON($return)->sendBody();
         }
         
     }

@@ -5,7 +5,7 @@ namespace App\Controllers\Rests;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\Nexmo;
 use App\Libraries\ResponseCode;
-use App\Models\M_publicreporters;
+use App\Eloquents\M_publicreporters;
 use Core\Rest\Curl;
 
 class Reporter extends Base_Rest
@@ -26,7 +26,7 @@ class Reporter extends Base_Rest
         ];
 
         $rand = randomnumber();
-        $reporter = M_publicreporters::getOne($params);
+        $reporter = M_publicreporters::findOne($params);
         if($reporter){
             $reporter->PhoneNumber = $phone;
             $reporter->Code = $rand;
@@ -178,7 +178,7 @@ class Reporter extends Base_Rest
                 'Result' => $number,
                 'Status' => ResponseCode::OK
             ];
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         // } else {
         //     $result = [
         //         'Message' => "Coba Lagi",
@@ -192,8 +192,8 @@ class Reporter extends Base_Rest
 
     public function verify(){
 
-        $raw = $this->restrequest->getRawBody();
-        $body = json_decode($raw);
+        $body = $this->restrequest->getJSON();
+        
 
         $params = [
             'where' => [
@@ -202,7 +202,7 @@ class Reporter extends Base_Rest
             ]
         ];
 
-        $reporter = M_publicreporters::getOne($params);
+        $reporter = M_publicreporters::findOne($params);
         if($reporter){
             $result = [
                 'Message' => lang('Form.success'),
@@ -210,16 +210,14 @@ class Reporter extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         } else {
             $results = [
                 'Message' => "Gagal Verifikasi",
                 'Status' => ResponseCode::FAILED_TO_VERIFY
             ];
 
-            // echo json_encode(sss);
-            $this->response->json($results, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
 
     }

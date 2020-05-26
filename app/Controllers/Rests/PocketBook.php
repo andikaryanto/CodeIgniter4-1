@@ -4,12 +4,7 @@ namespace App\Controllers\Rests;
 
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_pocketbooks;
-use App\Models\M_enumdetails;
-use App\Models\T_pocketbookoccurs;
-use Core\Nayo_Exception;
-use Exception;
-use Firebase\JWT\JWT;
+use App\Eloquents\M_pocketbooks;
 
 class PocketBook extends Base_Rest
 {
@@ -22,7 +17,7 @@ class PocketBook extends Base_Rest
     {
 
 
-            $pocketbooks = M_pocketbooks::getAll();
+            $pocketbooks = M_pocketbooks::findAll();
             foreach($pocketbooks as $p){
                 $p->Url = baseUrl($p->FileUrl);
             }
@@ -33,6 +28,6 @@ class PocketBook extends Base_Rest
                 'Status' => ResponseCode::OK
             ];   
 
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 }

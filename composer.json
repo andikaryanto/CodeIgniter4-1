@@ -14,7 +14,8 @@
         "psr/log": "^1.1",
         "laminas/laminas-escaper": "^2.6",
         "andikaryanto11/ci4orm":"dev-master",
-        "andikaryanto11/ci4datatables":"dev-master"
+        "andikaryanto11/ci4datatables":"dev-master",
+        "firebase/php-jwt":"^5.2"
     },
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",

@@ -4,12 +4,7 @@ namespace App\Controllers\Rests;
 
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_impacts;
-use App\Models\M_enumdetails;
-use App\Models\T_impactoccurs;
-use Core\Nayo_Exception;
-use Exception;
-use Firebase\JWT\JWT;
+use App\Eloquents\M_impacts;
 
 class Impact extends Base_Rest
 {
@@ -23,7 +18,7 @@ class Impact extends Base_Rest
 
         // if ($this->isGranted('t_impactoccur', 'Read')) {
 
-            $impacts = M_impacts::getAll();
+            $impacts = M_impacts::findAll();
             foreach($impacts as $impact){
                 $impact->value = $impact->Id;
             }
@@ -34,7 +29,7 @@ class Impact extends Base_Rest
                 'Status' => ResponseCode::OK
             ];   
 
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         // } else {
             // $result = [
             //     'Message' => 'Tidak ada akses untuk user anda',

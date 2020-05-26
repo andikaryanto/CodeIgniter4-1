@@ -34,7 +34,6 @@ class Base_Controller extends Controller
     protected $helpers = ['date','helper','paging','config','inflector','url', 'html', 'appurl', 'appform'];
     
     public $db;
-    public $request;
 
 	/**
 	 * Constructor.
@@ -51,7 +50,6 @@ class Base_Controller extends Controller
 		// $this->session = \Config\Services::session();
         $this->db = \Config\Database::connect();
         $this->negotiator = \Config\Services::negotiator();
-        $this->request = $request;
         $supported = [
             // $_SESSION['kospinlanguages']['Locale']
             'id'

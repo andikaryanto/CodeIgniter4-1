@@ -96,7 +96,7 @@ class M_company extends Base_Controller
 
         try {
             $companies->validate($oldmodel);
-            $file = $this->request->getFileMultiple('photo');
+            $file = $this->request->getFile('photo');
             $photo = new File("assets/upload/company/icon", ["jpg", "jpeg", "png"]);
             $result = $photo->upload($file);
             if ($result) {

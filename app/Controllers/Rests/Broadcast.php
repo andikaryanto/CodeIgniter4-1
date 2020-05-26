@@ -4,9 +4,9 @@ namespace App\Controllers\Rests;
 
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_earlywarnings;
-use App\Models\M_enumdetails;
-use App\Models\T_broadcastoccurs;
+use App\Eloquents\M_earlywarnings;
+use App\Eloquents\M_enumdetails;
+use App\Eloquents\T_broadcastoccurs;
 use Core\Nayo_Exception;
 use Exception;
 use Firebase\JWT\JWT;
@@ -22,7 +22,7 @@ class Broadcast extends Base_Rest
     {
 
         $type = [];
-        $usertype = $this->request->get("usertype");
+        $usertype = $this->request->getGet("usertype");
         if ($usertype == "public") {
             $type = [1, 3];
         } else if ($usertype == "user") {
@@ -42,9 +42,9 @@ class Broadcast extends Base_Rest
                 ]
             ];
 
-            $broadcasts = M_earlywarnings::getAll($params);
+            $broadcasts = M_earlywarnings::findAll($params);
             foreach ($broadcasts as $broadcast) {
-                $broadcast->TypeString = M_enumdetails::getEnumName("WarningType", $broadcast->TypeWarning);
+                $broadcast->TypeString = M_enumdetails::findEnumName("WarningType", $broadcast->TypeWarning);
                 // $broadcast->StrippedDescription = strip_tags($broadcast->Description);
                 $broadcast->StrippedDescription = strip_tags(html_entity_decode($broadcast->Description));
                 // $broadcast->Description = htmlspecialchars($broadcast->Description;
@@ -57,7 +57,7 @@ class Broadcast extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
 
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         }
 
         // } else {
@@ -81,9 +81,9 @@ class Broadcast extends Base_Rest
             ]
         ];
 
-        $broadcasts = M_earlywarnings::getOne($params);
+        $broadcasts = M_earlywarnings::findOne($params);
         // foreach ($broadcasts as $broadcast) {
-            $broadcasts->TypeString = M_enumdetails::getEnumName("WarningType", $broadcasts->TypeWarning);
+            $broadcasts->TypeString = M_enumdetails::findEnumName("WarningType", $broadcasts->TypeWarning);
             $broadcasts->StrippedDescription = strip_tags($broadcasts->Description);
             $broadcasts->DateMonth = get_formated_date($broadcasts->DateEnd, "d M");
             $broadcasts->DateEndStr = get_formated_date($broadcasts->DateEnd, "d M Y H:i");
@@ -97,6 +97,6 @@ class Broadcast extends Base_Rest
             'Status' => ResponseCode::OK
         ];
 
-        $this->response->json($result, 200);
+        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
     }
 }

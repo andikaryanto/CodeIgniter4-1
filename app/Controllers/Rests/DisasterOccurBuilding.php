@@ -2,17 +2,18 @@
 
 namespace App\Controllers\Rests;
 
+use AndikAryanto11\Eloquent;
+use App\Classes\Exception\EloquentException;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\G_transactionnumbers;
-use App\Models\M_enumdetails;
-use App\Models\M_familycards;
-use App\Models\M_forms;
-use App\Models\T_disasteroccurs;
-use App\Models\T_disasteroccurbuildings;
-use App\Models\T_disasterreports;
-use Core\Database\DbTrans;
-use Core\Nayo_Exception;
+use App\Eloquents\G_transactionnumbers;
+use App\Eloquents\M_enumdetails;
+use App\Eloquents\M_familycards;
+use App\Eloquents\M_forms;
+use App\Eloquents\T_disasteroccurs;
+use App\Eloquents\T_disasteroccurbuildings;
+use App\Eloquents\T_disasterreports;
+use App\Libraries\DbTrans;
 use Exception;
 use Firebase\JWT\JWT;
 
@@ -28,7 +29,7 @@ class DisasterOccurBuilding extends Base_Rest
 
         if ($this->isGranted('t_disasteroccur', 'Read')) {
             try {
-                $occur = T_disasteroccurs::get($occurId);
+                $occur = T_disasteroccurs::find($occurId);
                 if ($occur) {
                     if (count($occur->get_list_T_Disasteroccurbuilding()) > 0) {
                         $buildings = [];
@@ -55,21 +56,21 @@ class DisasterOccurBuilding extends Base_Rest
                         ];
 
                         // echo json_encode(sss);
-                        $this->response->json($result, 200);
+                        $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
                     } else {
-                        Nayo_Exception::throw("Tidak Ada Data", null,  ResponseCode::DATA_NOT_FOUND);
+                        throw new EloquentException("Tidak Ada Data", null,  ResponseCode::DATA_NOT_FOUND);
                     }
                 } else {
-                    Nayo_Exception::throw("Tidak Ada Data", null,  ResponseCode::DATA_NOT_FOUND);
+                    throw new EloquentException("Tidak Ada Data", null,  ResponseCode::DATA_NOT_FOUND);
                 }
-            } catch (Nayo_Exception $e) {
+            } catch (Eloquent $e) {
                 $result = [
                     'Message' => $e->messages,
                     'Status' => $e->status
                 ];
 
                 // echo json_encode(sss);
-                $this->response->json($result, 400);
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
             }
         }
     }
@@ -79,9 +80,9 @@ class DisasterOccurBuilding extends Base_Rest
         if ($this->isGranted('t_disasteroccur', 'Write')) {
             try {
                 DbTrans::beginTransaction();
-                $raw = $this->restrequest->getRawBody();
+                $body = $this->restrequest->getJSON();
 
-                $body = json_decode($raw);
+                
 
                 $disasteroccurbuildings = new T_disasteroccurbuildings();
                 $disasteroccurbuildings->M_Familycard_Id = $body->M_Familycard_Id;
@@ -100,8 +101,8 @@ class DisasterOccurBuilding extends Base_Rest
                     'Status' => ResponseCode::OK
                 ];
 
-                $this->response->json($result, 200);
-            } catch (Nayo_Exception $e) {
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
+            } catch (EloquentException $e) {
                 DbTrans::rollback();
                 $result = [
                     'Message' => $e->messages,
@@ -110,7 +111,7 @@ class DisasterOccurBuilding extends Base_Rest
                 ];
 
                 // echo json_encode(sss);
-                $this->response->json($result, 400);
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
             }
         }
     }
@@ -118,9 +119,9 @@ class DisasterOccurBuilding extends Base_Rest
     public function deleteBuilding($id){
         try{
 
-            $building = T_disasteroccurbuildings::get($id);
+            $building = T_disasteroccurbuildings::find($id);
             if(!$building){
-                Nayo_Exception::throw("Data Tidak Ada", null, ResponseCode::DATA_NOT_FOUND);
+                throw new EloquentException("Data Tidak Ada", null, ResponseCode::DATA_NOT_FOUND);
             }
 
             $building->delete();
@@ -130,8 +131,8 @@ class DisasterOccurBuilding extends Base_Rest
                 'Status' => ResponseCode::OK
             ];
 
-            $this->response->json($result, 200);
-        } catch (Nayo_Exception $e){
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
+        } catch (EloquentException $e){
 
             $results = [
                 'Message' => $e->messages,
@@ -139,7 +140,7 @@ class DisasterOccurBuilding extends Base_Rest
                 'Status' => $e->status
             ];
 
-            $this->response->json($results, 400);
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();;
         }
     }
 }

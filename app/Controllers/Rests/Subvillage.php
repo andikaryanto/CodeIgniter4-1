@@ -2,16 +2,9 @@
 
 namespace App\Controllers\Rests;
 
-use App\Controllers\M_village;
 use App\Controllers\Rests\Base_Rest;
 use App\Libraries\ResponseCode;
-use App\Models\M_disasters;
-use App\Models\M_enumdetails;
-use App\Models\M_subvillages;
-use App\Models\T_disasteroccurs;
-use Core\Nayo_Exception;
-use Exception;
-use Firebase\JWT\JWT;
+use App\Eloquents\M_subvillages;
 
 class Subvillage extends Base_Rest
 {
@@ -25,7 +18,7 @@ class Subvillage extends Base_Rest
 
         // if ($this->isGranted('t_disasteroccur', 'Read')) {
 
-            $subvillages = M_subvillages::getAll();
+            $subvillages = M_subvillages::findAll();
             $occurs = [];
 
             foreach ($subvillages as $subvillage) {
@@ -47,7 +40,7 @@ class Subvillage extends Base_Rest
                 'Status' => ResponseCode::OK
             ];   
 
-            $this->response->json($result, 200);
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
         // } else {
             // $result = [
             //     'Message' => 'Tidak ada akses untuk user anda',
