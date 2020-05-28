@@ -221,3 +221,5 @@ system/ThirdParty/Kint/resources/compiled/shared.js
 system/ThirdParty/Kint/resources/compiled/solarized-dark.css
 system/ThirdParty/Kint/resources/compiled/solarized.css
 system/ThirdParty/Kint/Utils.php
+*.png
+*.jpg

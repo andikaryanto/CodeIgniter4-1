@@ -43,7 +43,7 @@ class G_transactionnumbers extends BaseEloquent {
             // echo "a";
             $insert = self::insertNewFormNumber($formId, $year, $month, $type);
             if($insert > 0)
-                return self::getLastNumberByFormId($formId, $year, $month, $type);
+                return self::findLastNumberByFormId($formId, $year, $month, $type);
         }
 
         $result = $query;
@@ -108,7 +108,7 @@ class G_transactionnumbers extends BaseEloquent {
 				'Year' => $year,
 				'Month' => (int)$month,
 				'TypeTrans' => $type,
-                'Branch' => null
+                // 'Branch' => null
             )
         );
 

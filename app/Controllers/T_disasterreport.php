@@ -67,14 +67,14 @@ class T_disasterreport extends Base_Controller
             $result = true;
             $resultvideo = true;
             $file = $this->request->getFile('photo');
-            if ($file['name']) {
+            if ($file->getName()) {
                 $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);
                 $photourl = $photo->getFileUrl();
             }
 
             $filevideo = $this->request->getFile('video');
-            if ($filevideo['name']) {
+            if ($filevideo->getName()) {
                 $video = new File("assets/upload/disasterreport/video");
                 $resultvideo = $video->upload($filevideo);
                 $videourl = $video->getFileUrl();
@@ -123,14 +123,14 @@ class T_disasterreport extends Base_Controller
             $result = true;
             $resultvideo = true;
             $file = $this->request->getFile('photo');
-            if ($file['name']) {
+            if ($file->getName()) {
                 $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);
                 $photourl = $photo->getFileUrl();
             }
 
             $filevideo = $this->request->getFile('video');
-            if ($filevideo['name']) {
+            if ($filevideo->getName()) {
                 $video = new File("assets/upload/disasterreport/video");
                 $resultvideo = $video->upload($filevideo);
                 $videourl = $video->getFileUrl();
@@ -200,14 +200,14 @@ class T_disasterreport extends Base_Controller
             $result = true;
             $resultvideo = true;
             $file = $this->request->getFile('photo');
-            if ($file['name']) {
+            if ($file->getName()) {
                 $photo = new File("assets/upload/disasterreport/photo", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);
                 $photourl = $photo->getFileUrl();
             }
 
             $filevideo = $this->request->getFile('video');
-            if ($filevideo['name']) {
+            if ($filevideo->getName()) {
                 $video = new File("assets/upload/disasterreport/video");
                 $resultvideo = $video->upload($filevideo);
                 $videourl = $video->getFileUrl();

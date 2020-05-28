@@ -382,9 +382,9 @@
                 <div class="form-group">
                   <div class="required">
                     <?= formLabel(lang('Form.status')) ?>
-                    <?php $detail = "App\Models\M_enumdetails" ?>
+                    <?php $detail = "App\Eloquents\M_enumdetails" ?>
                     <?= formSelect(
-                      $detail::getEnums("DisasterOccurStatus"),
+                      $detail::findEnums("DisasterOccurStatus"),
                       "Value",
                       "EnumName",
                       array(

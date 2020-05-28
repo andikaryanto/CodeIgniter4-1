@@ -85,13 +85,13 @@ class T_disasteroccur extends Base_Controller
             $file = $this->request->getFile('photo');
             $filevideo = $this->request->getFile('video');
             if (empty($disasteroccurs->T_Disasterreport_Id)) {
-                if ($file['name']) {
+                if ($file->getName()) {
                     $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
                     $result = $photo->upload($file);
                     $photourl = $photo->getFileUrl();
                 }
 
-                if ($filevideo['name']) {
+                if ($filevideo->getName()) {
                     $video = new File("assets/upload/disasteroccur/video");
                     $resultvideo = $video->upload($filevideo);
                     $videourl = $video->getFileUrl();
@@ -101,13 +101,13 @@ class T_disasteroccur extends Base_Controller
                 $photourl = $report->Photo;
                 $videourl = $report->Video;
 
-                if ($file['name']) {
+                if ($file->getName()) {
                     $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
                     $result = $photo->upload($file);
                     $photourl = $photo->getFileUrl();
                 }
 
-                if ($filevideo['name']) {
+                if ($filevideo->getName()) {
                     $video = new File("assets/upload/disasteroccur/video");
                     $resultvideo = $video->upload($filevideo);
                     $videourl = $video->getFileUrl();
@@ -180,7 +180,7 @@ class T_disasteroccur extends Base_Controller
             if ($disasteroccurs->T_Disasterreport_Id)
                 $report = T_disasterreports::find($disasteroccurs->T_Disasterreport_Id);
 
-            if ($file['name']) {
+            if ($file->getName()) {
                 $photo = new File("assets/upload/disasteroccur/photo", ["jpg", "jpeg"]);
                 $result = $photo->upload($file);
                 unlink(FCPATH . $disasteroccurs->Photo);
@@ -189,7 +189,7 @@ class T_disasteroccur extends Base_Controller
                 $photourl = $disasteroccurs->Photo;
             }
 
-            if ($filevideo['name']) {
+            if ($filevideo->getName()) {
                 $video = new File("assets/upload/disasteroccur/video");
                 $resultvideo = $video->upload($filevideo);
                 unlink(FCPATH . $disasteroccurs->Video);
