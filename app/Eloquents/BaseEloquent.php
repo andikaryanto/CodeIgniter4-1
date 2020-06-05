@@ -15,37 +15,41 @@ class BaseEloquent extends Eloquent{
         parent::__construct($this->dbs);
     }
 
-    public function parseFromRequest(){
+    public function parseFromRequest($isJson = false){
         $request = $this->request;
         $fields = $this->dbs->getFieldData($this->table);
+        if($isJson)
+            $post = $request->getJSON();
+        else
+            $post = (object)$request->getPost();
         if ($fields) {
             foreach ($fields as $field) {
                 $prop = $field->name;
                 $type = $field->type;
                 $length = $field->max_length;
-                $post = $request->getPost();
+                
                 if (key_exists($prop, $post)){
-                    if (!empty($request->getPost($prop))) {
+                    if (!empty($post->$prop)) {
                         if (preg_match("/^int/", $type))
-                            $this->$prop = setisnumber($request->getPost($prop));
+                            $this->$prop = setisnumber($post->$prop);
                         else if (preg_match("/^varchar/", $type))
-                            $this->$prop = setisnull($request->getPost($prop));
+                            $this->$prop = setisnull($post->$prop);
                         else if (preg_match("/^decimal/", $type))
-                            $this->$prop = setisdecimal($request->getPost($prop));
+                            $this->$prop = setisdecimal($post->$prop);
                         else if (preg_match("/^datetime/", $type))
-                            $this->$prop = get_formated_date($request->getPost($prop));
+                            $this->$prop = get_formated_date($post->$prop);
                         else if (preg_match("/^date/", $type))
-                            $this->$prop = get_formated_date($request->getPost($prop), "Y-m-d");
+                            $this->$prop = get_formated_date($post->$prop, "Y-m-d");
                         else if (preg_match("/^double/", $type))
-                            $this->$prop = $request->getPost($prop);
+                            $this->$prop = $post->$prop;
                         else if(preg_match("/^smallint/", $type)){
                             if($length == 1){
                                 $this->$prop = 1;
                             } else {
-                                $this->$prop = setisnumber($request->getPost($prop));
+                                $this->$prop = setisnumber($post->$prop);
                             }
                         }else if (preg_match("/^text/", $type))
-                            $this->$prop = $request->getPost($prop);
+                            $this->$prop = $post->$prop;
                     } else {
                         $this->$prop = null;
                     } 

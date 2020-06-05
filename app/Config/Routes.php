@@ -725,6 +725,15 @@ $routes->group('/api', function ($routes) {
         $routes->get('list', 'Rests\Disaster::getDisasters');
     });
 
+    $routes->group('groupuser', function ($routes) {
+        $routes->get('list', 'Rests\MGroupuser::getGroupusers');
+        $routes->post('create', 'Rests\MGroupuser::postData');
+    });
+
+    $routes->group('user', function ($routes) {
+        $routes->get('list', 'Rests\MUser::getUsers');
+    });
+
     $routes->group('pocketbook', function ($routes) {
         $routes->get('list', 'Rests\PocketBook::getPocketbooks');
     });
