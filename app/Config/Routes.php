@@ -728,6 +728,8 @@ $routes->group('/api', function ($routes) {
     $routes->group('groupuser', function ($routes) {
         $routes->get('list', 'Rests\MGroupuser::getGroupusers');
         $routes->post('create', 'Rests\MGroupuser::postData');
+        $routes->put('update/(:num)', 'Rests\MGroupuser::putData/$1');
+        $routes->get('get/(:num)', 'Rests\MGroupuser::getDataById/$1');
     });
 
     $routes->group('user', function ($routes) {

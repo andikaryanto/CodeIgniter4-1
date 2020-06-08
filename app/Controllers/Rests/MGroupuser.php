@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Rests;
 
+use App\Classes\Exception\EloquentException;
 use App\Controllers\Rests\Base_Rest;
 use App\Eloquents\M_groupusers;
 use App\Libraries\ResponseCode;
@@ -63,10 +64,10 @@ class MGroupuser extends Base_Rest
         $this->response->setStatusCode(200)->setJSON($result)->sendBody();
     }
 
-    public function postData(){
-        $groupuser = new M_groupusers();
-        $groupuser->parseFromRequest(true);
-        $groupuser->save();
+    
+
+    public function getDataById($id){
+        $groupuser = M_groupusers::find($id);
 
         $result = [
             'Message' => lang('Form.success'),
@@ -76,5 +77,57 @@ class MGroupuser extends Base_Rest
         
         $this->response->setStatusCode(200)->setJSON($result)->sendBody();
 
+    }
+
+    public function postData(){
+        $groupuser = new M_groupusers();
+        $groupuser->parseFromRequest(true);
+        try{
+            $groupuser->validate();
+            $groupuser->save();
+
+            $result = [
+                'Message' => "Data Tersimpan",
+                'Result' => $groupuser,
+                'Status' => ResponseCode::OK
+            ];  
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+    
+        } catch (EloquentException $e){
+            $result = [
+                'Message' => $e->getMessages(),
+                'Result' => $groupuser,
+                'Status' => $e->getReponseCode()
+            ];  
+
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+        }
+        
+    }
+
+    public function putData($id){
+        $groupuser = M_groupusers::find($id);
+        $oldmodel = clone $groupuser;
+        $groupuser->parseFromRequest(true);
+        try{
+            $groupuser->validate($oldmodel);
+            $groupuser->save();
+
+            $result = [
+                'Message' => "Data Diubah",
+                'Result' => $groupuser,
+                'Status' => ResponseCode::OK
+            ];  
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+    
+        } catch (EloquentException $e){
+            $result = [
+                'Message' => $e->getMessages(),
+                'Result' => $groupuser,
+                'Status' => $e->getReponseCode()
+            ];  
+
+            $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+        }
     }
 }
