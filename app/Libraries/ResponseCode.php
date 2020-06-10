@@ -16,6 +16,8 @@ class ResponseCode {
     const NO_DATA_FOUND = ["Status" => "NO_DATA_FOUND", "Code" =>2006];
     const DATA_EXIST = ["Status" => "DATA_EXIST", "Code" =>2007];
     const INVALID_DATA = ["Status" => "INVALID_DATA", "Code" =>2008];
+    const FAILED_DELETE_DATA = ["Status" => "FAILED_DELETE_DATA", "Code" =>2009];
+    const SESSION_EXPIRED = ["Status" => "SESSION_EXPIRED", "Code" =>2010];
     
 
 }   

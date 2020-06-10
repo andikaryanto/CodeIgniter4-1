@@ -37,7 +37,7 @@ class Authentication extends Base_Controller {
         } else {
             $return = [
                 'message' => lang('Info.failed_logged_in')
-            ];
+            ]; 
             
             $this->response->setStatusCode(400)->setJSON($return)->sendBody();
         }

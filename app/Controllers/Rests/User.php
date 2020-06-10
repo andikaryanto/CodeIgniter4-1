@@ -31,14 +31,25 @@ class User extends Base_Rest
                 throw new EloquentException(array(0 => lang('Error.failed_login')), null, ResponseCode::INVALID_LOGIN);
             }
 
-            $jwt = JWT::encode($query, getSecretKey());
+            $sessionexpired = 2; 
+            $struserdate = get_current_date("Y-m-d H:i:s");
+            $userdate = set_date($struserdate);
+            $exipredate = $sessionexpired > 0 ? set_date(date('Y-m-d H:i:s',strtotime("+{$sessionexpired} hours",strtotime($struserdate)))) : null;
+           
+            $return = [
+                "User" => $query,
+                "LoggedinAt" => $userdate->getTimestamp(),
+                "ExpiredAt" => $exipredate == null? null : $exipredate->getTimestamp()
+            ];
+
+            $jwt = JWT::encode($return, getSecretKey());
             $result = [
                 'Message' => lang('Info.login_success'),
                 'SessionToken' => $jwt,
                 'Status' => ResponseCode::OK
             ];
             // $decoded = JWT::decode($jwt, $key, array('HS256')); 
-            $this->response->setStatusCode(200)->setJSON($result)->sendBody();;
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
         } catch (EloquentException $e) {
             $result = [
                 'Message' => $e->messages[0],

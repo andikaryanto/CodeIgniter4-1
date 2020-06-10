@@ -18,50 +18,52 @@ class MGroupuser extends Base_Rest
 
     public function getGroupusers()
     {
-        $page = !is_null($this->request->getGet("page")) ? $this->request->getGet("page") : 1;
-        $size = !is_null($this->request->getGet("size")) ? $this->request->getGet("size") : 5;
-        $params = [
-            'limit' => [
-                'page' => $page,
-                'size' => $size
-            ]
-        ];
+        if($this->isGranted('m_groupuser', 'Read')){
+            $page = !is_null($this->request->getGet("page")) ? $this->request->getGet("page") : 1;
+            $size = !is_null($this->request->getGet("size")) ? $this->request->getGet("size") : 5;
+            $params = [
+                'limit' => [
+                    'page' => $page,
+                    'size' => $size
+                ]
+            ];
 
-        $datatable = new DtTables($params);
-        $datatable->eloquent('App\\Eloquents\\M_groupusers');
-        $datatable
-            ->addDtRowClass("rowdetail")
-            ->addColumn(
-                'Id',
-                null,
-                function ($row) {
-                    return $row->Id;
-                },
-                false,
-                false
-            )->addColumn(
-                'GroupName',
-                null,
-                function ($row) {
-                    return $row->GroupName;
-                }
-            )->addColumn(
-                'Description',
-                null,
-            )->addColumn(
-                'Created',
-                null,
-                null,
-                false
-            );
+            $datatable = new DtTables($params);
+            $datatable->eloquent('App\\Eloquents\\M_groupusers');
+            $datatable
+                ->addDtRowClass("rowdetail")
+                ->addColumn(
+                    'Id',
+                    null,
+                    function ($row) {
+                        return $row->Id;
+                    },
+                    false,
+                    false
+                )->addColumn(
+                    'GroupName',
+                    null,
+                    function ($row) {
+                        return $row->GroupName;
+                    }
+                )->addColumn(
+                    'Description',
+                    null,
+                )->addColumn(
+                    'Created',
+                    null,
+                    null,
+                    false
+                );
 
-        $result = [
-            'Message' => lang('Form.success'),
-            'Result' => $datatable->populate(),
-            'Status' => ResponseCode::OK
-        ];   
+            $result = [
+                'Message' => lang('Form.success'),
+                'Result' => $datatable->populate(),
+                'Status' => ResponseCode::OK
+            ];   
 
-        $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+        } 
     }
 
     
@@ -80,53 +82,86 @@ class MGroupuser extends Base_Rest
     }
 
     public function postData(){
-        $groupuser = new M_groupusers();
-        $groupuser->parseFromRequest(true);
-        try{
-            $groupuser->validate();
-            $groupuser->save();
+        if($this->isGranted('m_groupuser', 'Write')){
+            $groupuser = new M_groupusers();
+            $groupuser->parseFromRequest(true);
+            try{
+                $groupuser->validate();
+                $groupuser->save();
 
-            $result = [
-                'Message' => "Data Tersimpan",
-                'Result' => $groupuser,
-                'Status' => ResponseCode::OK
-            ];  
-            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
-    
-        } catch (EloquentException $e){
-            $result = [
-                'Message' => $e->getMessages(),
-                'Result' => $groupuser,
-                'Status' => $e->getReponseCode()
-            ];  
+                $result = [
+                    'Message' => "Data Tersimpan",
+                    'Result' => $groupuser,
+                    'Status' => ResponseCode::OK
+                ];  
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+        
+            } catch (EloquentException $e){
+                $result = [
+                    'Message' => $e->getMessages(),
+                    'Result' => $groupuser,
+                    'Status' => $e->getReponseCode()
+                ];  
 
-            $this->response->setStatusCode(400)->setJSON($result)->sendBody();
-        }
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+            }
+        }  
         
     }
 
     public function putData($id){
+        if($this->isGranted('m_groupuser', 'Write')){
+            $groupuser = M_groupusers::find($id);
+            $oldmodel = clone $groupuser;
+            $groupuser->parseFromRequest(true);
+            try{
+                $groupuser->validate($oldmodel);
+                $groupuser->save();
+
+                $result = [
+                    'Message' => "Data Diubah",
+                    'Result' => $groupuser,
+                    'Status' => ResponseCode::OK
+                ];  
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+        
+            } catch (EloquentException $e){
+                $result = [
+                    'Message' => $e->getMessages(),
+                    'Result' => $groupuser,
+                    'Status' => $e->getReponseCode()
+                ];  
+
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+            }
+        }
+    }
+
+    public function deleteData($id){
         $groupuser = M_groupusers::find($id);
-        $oldmodel = clone $groupuser;
-        $groupuser->parseFromRequest(true);
-        try{
-            $groupuser->validate($oldmodel);
-            $groupuser->save();
-
+        if(!is_null($groupuser)){
+            $res = $groupuser->delete();
+            if($res){
+                $result = [
+                    'Message' => "Data Terhapus",
+                    'Result' => $res,
+                    'Status' => ResponseCode::OK
+                ];  
+                $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+            } else {
+                $result = [
+                    'Message' => "Gagal Menghapus Data",
+                    'Result' => $res,
+                    'Status' => ResponseCode::FAILED_DELETE_DATA
+                ];  
+                $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+            }
+        } else {
             $result = [
-                'Message' => "Data Diubah",
-                'Result' => $groupuser,
-                'Status' => ResponseCode::OK
+                'Message' => "Gagal Menghapus Data",
+                'Result' => false,
+                'Status' => ResponseCode::FAILED_DELETE_DATA
             ];  
-            $this->response->setStatusCode(200)->setJSON($result)->sendBody();
-    
-        } catch (EloquentException $e){
-            $result = [
-                'Message' => $e->getMessages(),
-                'Result' => $groupuser,
-                'Status' => $e->getReponseCode()
-            ];  
-
             $this->response->setStatusCode(400)->setJSON($result)->sendBody();
         }
     }

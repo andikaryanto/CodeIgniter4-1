@@ -28,22 +28,24 @@ class DtTables extends Datatables{
             $sort = $this->request->getGet("sortColumn");
             foreach($this->getColumns() as $column){
                 $col = explode(".", $column['column']);
+                
                 if(count($col) == 2){
                     $selectedColumn = $col[1];
                     if($selectedColumn == $sort){
                         $params['order'][$column['column']] = strtoupper($this->request->getGet("sortOrder"));
+                        break;
                     }
-                    break;
                 } else {
                     $selectedColumn = $col[0];
                     if($selectedColumn == $sort){
                         $params['order'][$column['column']] = strtoupper($this->request->getGet("sortOrder"));
+                        
+                        break;
                     }
-                    break;
                 }
             }
-        }
 
+        }
         return $params;
     }
 }
