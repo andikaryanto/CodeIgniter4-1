@@ -46,6 +46,18 @@ class DtTables extends Datatables{
             }
 
         }
+
+        if ($this->request->getGet('search')) {
+            $searchValue = $this->request->getGet('search');
+
+            foreach ($this->getColumns() as $column) {
+                if ($column['searchable']) {
+                    $params['orLike'][$column['column']] = $searchValue;
+                }
+            }
+        }
+
+
         return $params;
     }
 }

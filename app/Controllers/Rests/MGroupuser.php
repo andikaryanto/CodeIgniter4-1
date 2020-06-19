@@ -21,13 +21,16 @@ class MGroupuser extends Base_Rest
         if($this->isGranted('m_groupuser', 'Read')){
             $page = !is_null($this->request->getGet("page")) ? $this->request->getGet("page") : 1;
             $size = !is_null($this->request->getGet("size")) ? $this->request->getGet("size") : 5;
-            $params = [
-                'limit' => [
-                    'page' => $page,
-                    'size' => $size
-                ]
-            ];
-
+            $params = [];
+            if($size > 0){
+                $params = [
+                    'limit' => [
+                        'page' => $page,
+                        'size' => $size
+                    ]
+                ];
+            }
+            
             $datatable = new DtTables($params);
             $datatable->eloquent('App\\Eloquents\\M_groupusers');
             $datatable
