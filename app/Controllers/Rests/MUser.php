@@ -19,6 +19,13 @@ class MUser extends Base_Rest
     {
         $page = !is_null($this->request->getGet("page")) ? $this->request->getGet("page") : 1;
         $size = !is_null($this->request->getGet("size")) ? $this->request->getGet("size") : 5;
+        $limit = [];
+        if($size > 0){
+            $limit = [
+                    'page' => $page,
+                    'size' => $size
+            ];
+        }
 
        
         $params = [
@@ -33,10 +40,7 @@ class MUser extends Base_Rest
                     ]
                 ]
             ],
-            'limit' => [
-                'page' => $page,
-                'size' => $size
-            ]
+            'limit' => $limit
 
 
         ];
@@ -61,8 +65,7 @@ class MUser extends Base_Rest
             )->addColumn(
                 'm_groupusers.GroupName',
                 'M_Groupuser_Id',
-                null,
-                false
+                null
             )->addColumn(
                 'm_users.Created',
                 null,

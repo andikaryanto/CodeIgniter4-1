@@ -51,7 +51,7 @@ class MGroupuser extends Base_Rest
                     }
                 )->addColumn(
                     'Description',
-                    null,
+                    null
                 )->addColumn(
                     'Created',
                     null,
@@ -141,31 +141,33 @@ class MGroupuser extends Base_Rest
     }
 
     public function deleteData($id){
-        $groupuser = M_groupusers::find($id);
-        if(!is_null($groupuser)){
-            $res = $groupuser->delete();
-            if($res){
-                $result = [
-                    'Message' => "Data Terhapus",
-                    'Result' => $res,
-                    'Status' => ResponseCode::OK
-                ];  
-                $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+        if($this->isGranted('m_groupuser', 'Delete')){
+            $groupuser = M_groupusers::find($id);
+            if(!is_null($groupuser)){
+                $res = $groupuser->delete();
+                if($res){
+                    $result = [
+                        'Message' => "Data Terhapus",
+                        'Result' => $res,
+                        'Status' => ResponseCode::OK
+                    ];  
+                    $this->response->setStatusCode(200)->setJSON($result)->sendBody();
+                } else {
+                    $result = [
+                        'Message' => "Gagal Menghapus Data",
+                        'Result' => $res,
+                        'Status' => ResponseCode::FAILED_DELETE_DATA
+                    ];  
+                    $this->response->setStatusCode(400)->setJSON($result)->sendBody();
+                }
             } else {
                 $result = [
                     'Message' => "Gagal Menghapus Data",
-                    'Result' => $res,
+                    'Result' => false,
                     'Status' => ResponseCode::FAILED_DELETE_DATA
                 ];  
                 $this->response->setStatusCode(400)->setJSON($result)->sendBody();
             }
-        } else {
-            $result = [
-                'Message' => "Gagal Menghapus Data",
-                'Result' => false,
-                'Status' => ResponseCode::FAILED_DELETE_DATA
-            ];  
-            $this->response->setStatusCode(400)->setJSON($result)->sendBody();
         }
     }
 }

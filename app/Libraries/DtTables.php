@@ -25,7 +25,7 @@ class DtTables extends Datatables{
         $params['group'] = isset($this->filter['group']) ? $this->filter['group'] : null;
 
         if(!is_null($this->request->getGet("sortColumn"))){
-            $sort = $this->request->getGet("sortColumn");
+            $sort = $this->request->getGet("sortColumn");   
             foreach($this->getColumns() as $column){
                 $col = explode(".", $column['column']);
                 
@@ -49,12 +49,13 @@ class DtTables extends Datatables{
 
         if ($this->request->getGet('search')) {
             $searchValue = $this->request->getGet('search');
-
+            $groups = [];
             foreach ($this->getColumns() as $column) {
                 if ($column['searchable']) {
-                    $params['orLike'][$column['column']] = $searchValue;
+                    $groups[$column['column']] = $searchValue;
                 }
             }
+            $params['group']['orLike'] = $groups;
         }
 
 
