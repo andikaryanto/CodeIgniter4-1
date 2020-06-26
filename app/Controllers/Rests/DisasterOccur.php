@@ -10,6 +10,7 @@ use App\Eloquents\M_enumdetails;
 use App\Eloquents\M_forms;
 use App\Eloquents\T_disasteroccurs;
 use App\Eloquents\T_disasterreports;
+use App\Libraries\DtTables;
 use Core\Nayo_Exception;
 use Exception;
 use Firebase\JWT\JWT;
@@ -31,48 +32,107 @@ class DisasterOccur extends Base_Rest
             $size = $this->request->getGet("size");
             $params = [
                 'order' => [
-                    'Created' => 'DESC'
+                    't_disasteroccurs.Created' => 'DESC'
                 ],
                 'limit' => [
                     'page' => $page,
                     'size' => $size
+                ],
+                'join' => [
+                    'm_subvillages' => [
+                        [
+                            'key' => 't_disasteroccurs.M_Subvillage_Id = m_subvillages.Id',
+                            'type' => 'left'
+                        ]
+                    ],
+                    't_disasterreports' => [
+                        [
+                            'key' => 't_disasteroccurs.T_Disasterreport_Id = t_disasterreports.Id',
+                            'type' => 'left'
+                        ]
+                    ]
                 ]
             ];
 
-            $disasters = T_disasteroccurs::findAll($params);
-            $occurs = [];
+            // $disasters = T_disasteroccurs::findAll($params);
+            // $occurs = [];
 
-            foreach ($disasters as $disaster) {
-                $subvillage = $disaster->get_M_Subvillage();
-                $village = $subvillage->get_M_Village();
-                $subdistrict = $village->get_M_Subdistrict();
-                $district = $subdistrict->get_M_District();
-                $province = $district->get_M_Province();
-                $disaster->Noref = $disaster->get_T_Disasterreport()->ReportNo;
-                $disaster->StatusName = M_enumdetails::findEnumName("DisasterOccurStatus", $disaster->Status);
-                $disaster->DisasterName = $disaster->get_M_Disaster()->Name;
-                $disaster->Address = "{$subvillage->Name} {$disaster->RT}/{$disaster->RW}, {$village->Name}, {$subdistrict->Name}, {$district->Name}, {$province->Name}";
-                if($showImage == "true"){
-                    $disaster->Photo = "data:image/*;charset=utf-8;base64,".$disaster->Photo64;
-                } else {
+            // foreach ($disasters as $disaster) {
+            //     $subvillage = $disaster->get_M_Subvillage();
+            //     $village = $subvillage->get_M_Village();
+            //     $subdistrict = $village->get_M_Subdistrict();
+            //     $district = $subdistrict->get_M_District();
+            //     $province = $district->get_M_Province();
+            //     $disaster->Noref = $disaster->get_T_Disasterreport()->ReportNo;
+            //     $disaster->StatusName = M_enumdetails::findEnumName("DisasterOccurStatus", $disaster->Status);
+            //     $disaster->DisasterName = $disaster->get_M_Disaster()->Name;
+            //     $disaster->Address = "{$subvillage->Name} {$disaster->RT}/{$disaster->RW}, {$village->Name}, {$subdistrict->Name}, {$district->Name}, {$province->Name}";
+            //     if($showImage == "true"){
+            //         $disaster->Photo = "data:image/*;charset=utf-8;base64,".$disaster->Photo64;
+            //     } else {
                     
-                    $disaster->Photo64 = null;
-                }
-                $mdisaster = $disaster->get_M_Disaster();
-                $disaster->Disaster = $mdisaster;
-                $disaster->Icon = baseUrl($mdisaster->Icon);
-                $disaster->Subvillage = $subvillage;
-                $disaster->Subvillage->Village = $village;
-                $disaster->Subvillage->Village->Subdistrict =  $subdistrict;
-                $disaster->Subvillage->Village->Subdistrict->District =  $district;
-                $disaster->Subvillage->Village->Subdistrict->District->Province = $province;
-            }
+            //         $disaster->Photo64 = null;
+            //     }
+            //     $mdisaster = $disaster->get_M_Disaster();
+            //     $disaster->Disaster = $mdisaster;
+            //     $disaster->Icon = baseUrl($mdisaster->Icon);
+            //     $disaster->Subvillage = $subvillage;
+            //     $disaster->Subvillage->Village = $village;
+            //     $disaster->Subvillage->Village->Subdistrict =  $subdistrict;
+            //     $disaster->Subvillage->Village->Subdistrict->District =  $district;
+            //     $disaster->Subvillage->Village->Subdistrict->District->Province = $province;
+            // }
 
-            $occurs = $disasters;
+            // $occurs = $disasters;
+
+            $datatable = new DtTables($params, false);
+            $datatable->eloquent("App\\Eloquents\\T_disasteroccurs");
+            $datatable->addColumn("t_disasteroccurs.Id",
+                        null,
+                        function ($row) {
+                            return $row->Id;
+                        },
+                        false,
+                        false)
+            ->addColumn('t_disasteroccurs.TransNo',
+                        null,
+                        function ($row) {
+                            return $row->TransNo;
+                        })
+            ->addColumn('t_disasteroccurs.ReporterName',
+                        null,
+                        function ($row) {
+                            return $row->ReporterName;
+                        })
+            ->addColumn('t_disasteroccurs.Phone',
+                        null,
+                        function ($row) {
+                            return $row->Phone;
+                        })
+            
+            ->addColumn('m_subvillages.Name.Subvillage',
+                        'M_Subvillage_Id',
+                        null,
+                        function ($row) {
+                            return $row->Phone;
+                        })
+            ->addColumn('t_disasterreports.ReportNo',
+                        'T_Disasterreport_Id',
+                        null,
+                        null,
+                        null)
+            ->addColumn(
+                        't_disasteroccurs.Created',
+                        null,
+                        null,
+                        false
+                    );
+            ;
+
 
             $result = [
                 'Message' => lang('Form.success'),
-                'Result' => $occurs,
+                'Result' => $datatable->populate(),
                 'Status' => ResponseCode::OK
             ];
 

@@ -5,9 +5,9 @@ use AndikAryanto11\Datatables;
 
 class DtTables extends Datatables{
 
-    public function __construct($params = [])
+    public function __construct($params = [], $retunEntity = true)
     {
-        parent::__construct($params, false);
+        parent::__construct($params,  $retunEntity, false);
     }
 
     public function setParams()
