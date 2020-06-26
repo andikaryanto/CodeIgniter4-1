@@ -45,6 +45,12 @@ class DisasterOccur extends Base_Rest
                             'type' => 'left'
                         ]
                     ],
+                    'm_disasters' => [
+                        [
+                            'key' => 't_disasteroccurs.M_Disaster_Id = m_disasters.Id',
+                            'type' => 'left'
+                        ]
+                    ],
                     't_disasterreports' => [
                         [
                             'key' => 't_disasteroccurs.T_Disasterreport_Id = t_disasterreports.Id',
@@ -117,12 +123,53 @@ class DisasterOccur extends Base_Rest
                             return $row->Phone;
                         })
             ->addColumn('t_disasterreports.ReportNo',
-                        'T_Disasterreport_Id',
                         null,
                         null,
-                        null)
+                        null,
+                        true)
+            ->addColumn('m_disasters.Name.DisasterName',
+                       null,
+                        null,
+                        null,
+                        true)
+            ->addColumn('m_disasters.Icon.Icon',
+                        null,
+                        null,
+                        null,
+                        false)
+            ->addColumn('t_disasteroccurs.DateOccur',
+                        null,
+                        null,
+                        null,
+                        false)
+            ->addColumn('t_disasteroccurs.Latitude',
+                        null,
+                        null,
+                        null,
+                        false)
+            ->addColumn('t_disasteroccurs.Longitude',
+                        null,
+                        null,
+                        null,
+                        false)
+            ->addColumn('t_disasteroccurs.Photo',
+                        null,
+                        null,
+                        null,
+                        false)
+            ->addColumn('t_disasteroccurs.Status',
+                        null,
+                        null,
+                        null,
+                        false)
             ->addColumn(
                         't_disasteroccurs.Created',
+                        null,
+                        null,
+                        false
+                    )
+            ->addColumn(
+                        't_disasteroccurs.IsNeedLogistic',
                         null,
                         null,
                         false
