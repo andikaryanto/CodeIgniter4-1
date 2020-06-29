@@ -29,10 +29,10 @@ class DtTables extends Datatables{
             foreach($this->getColumns() as $column){
                 $col = explode(".", $column['column']);
                 
-                if(count($col) == 2){
+                if(count($col) == 3){
                     $selectedColumn = $col[1];
                     if($selectedColumn == $sort){
-                        $params['order'][$column['column']] = strtoupper($this->request->getGet("sortOrder"));
+                        $params['order'][$col[0].".".$col[1]] = strtoupper($this->request->getGet("sortOrder"));
                         break;
                     }
                 } else {
@@ -52,7 +52,13 @@ class DtTables extends Datatables{
             $groups = [];
             foreach ($this->getColumns() as $column) {
                 if ($column['searchable']) {
-                    $groups[$column['column']] = $searchValue;
+                    $col = explode(".", $column['column']);
+                    if(count($col) == 3)
+                        $groups[$col[0].".".$col[1]] = $searchValue;
+                    else if(count($col) == 2)
+                        $groups[$col[0].".".$col[1]] = $searchValue;
+                    else 
+                        $groups[$column['column']] = $searchValue;
                 }
             }
             $params['group']['orLike'] = $groups;

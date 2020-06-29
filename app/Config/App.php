@@ -21,7 +21,7 @@ class App extends BaseConfig
 	| environments.
 	|
 	*/
-	public $baseURL = 'http://ci4nd.local/';
+	public $baseURL = 'http://localhost:8889/Codeigniter4-1/';
 
 	/*
 	|--------------------------------------------------------------------------

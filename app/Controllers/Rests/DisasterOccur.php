@@ -28,16 +28,20 @@ class DisasterOccur extends Base_Rest
         if ($this->isGranted('t_disasteroccur', 'Read')) {
 
             $showImage = $this->request->getGet("showimage");
-            $page = $this->request->getGet("page");
-            $size = $this->request->getGet("size");
+            $page = !is_null($this->request->getGet("page")) ? $this->request->getGet("page") : 1;
+            $size = !is_null($this->request->getGet("size")) ? $this->request->getGet("size") : 5;
+            $limit = [];
+            if($size > 0){
+                $limit = [
+                        'page' => $page,
+                        'size' => $size
+                ];
+            }
             $params = [
                 'order' => [
                     't_disasteroccurs.Created' => 'DESC'
                 ],
-                'limit' => [
-                    'page' => $page,
-                    'size' => $size
-                ],
+                'limit' => $limit,
                 'join' => [
                     'm_subvillages' => [
                         [
@@ -100,48 +104,20 @@ class DisasterOccur extends Base_Rest
                         },
                         false,
                         false)
-            ->addColumn('t_disasteroccurs.TransNo',
-                        null,
-                        function ($row) {
-                            return $row->TransNo;
-                        })
-            ->addColumn('t_disasteroccurs.ReporterName',
-                        null,
-                        function ($row) {
-                            return $row->ReporterName;
-                        })
-            ->addColumn('t_disasteroccurs.Phone',
-                        null,
-                        function ($row) {
-                            return $row->Phone;
-                        })
-            
-            ->addColumn('m_subvillages.Name.Subvillage',
-                        'M_Subvillage_Id',
-                        null,
-                        function ($row) {
-                            return $row->Phone;
-                        })
-            ->addColumn('t_disasterreports.ReportNo',
-                        null,
-                        null,
-                        null,
-                        true)
-            ->addColumn('m_disasters.Name.DisasterName',
-                       null,
-                        null,
-                        null,
-                        true)
+            ->addColumn('t_disasteroccurs.TransNo')
+            ->addColumn('t_disasteroccurs.ReporterName')
+            ->addColumn('t_disasteroccurs.Phone')
+            ->addColumn('t_disasteroccurs.RT')
+            ->addColumn('t_disasteroccurs.RW')
+            ->addColumn('m_subvillages.Name.Subvillage')
+            ->addColumn('t_disasterreports.ReportNo')
+            ->addColumn('m_disasters.Name.DisasterName')
             ->addColumn('m_disasters.Icon.Icon',
                         null,
                         null,
                         null,
                         false)
-            ->addColumn('t_disasteroccurs.DateOccur',
-                        null,
-                        null,
-                        null,
-                        false)
+            ->addColumn('t_disasteroccurs.DateOccur')
             ->addColumn('t_disasteroccurs.Latitude',
                         null,
                         null,
